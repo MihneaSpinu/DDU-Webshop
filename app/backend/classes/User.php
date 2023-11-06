@@ -39,10 +39,10 @@ class User
     {
         if (!$id && $this->isLoggedIn())
         {
-            $id = $this->data()->user_id;
+            $id = $this->data()->uid;
         }
 
-        if (!$this->_db->update('users', 'user_id', $id, $fields))
+        if (!$this->_db->update('users', 'uid', $id, $fields))
         {
             throw new Exception('Unable to update the user.');
         }
@@ -60,7 +60,7 @@ class User
     {
         if ($user)
         {
-            $field  = (is_numeric($user)) ? 'user_id' : 'username';
+            $field  = (is_numeric($user)) ? 'uid' : 'username';
 
             $data = $this->_db->get('users', array($field, '=', $user));
 
@@ -76,7 +76,7 @@ class User
     {
         if (! $username && ! $password && $this->exists())
         {
-            Session::put($this->_sessionName, $this->data()->user_id);
+            Session::put($this->_sessionName, $this->data()->uid);
         }
         else
         {
@@ -86,17 +86,17 @@ class User
             {
                 if (Password::check($password, $this->data()->password))
                 {
-                    Session::put($this->_sessionName, $this->data()->user_id);
+                    Session::put($this->_sessionName, $this->data()->uid);
 
                     if ($remember)
                     {
                         $hash       = Hash::unique();
-                        $hashCheck  = $this->_db->get('users_sessions', array('user_id', '=', $this->data()->user_id));
+                        $hashCheck  = $this->_db->get('users_sessions', array('uid', '=', $this->data()->uid));
 
                         if (!$hashCheck->count())
                         {
                             $this->_db->insert('users_sessions', array(
-                                'user_id'   => $this->data()->user_id,
+                                'uid'   => $this->data()->uid,
                                 'hash'      => $hash
                             ));
                         }
@@ -140,7 +140,7 @@ class User
 
     public function logout()
     {
-        $this->_db->delete('users_sessions', array('user_id', '=', $this->data()->user_id));
+        $this->_db->delete('users_sessions', array('uid', '=', $this->data()->uid));
 
         Session::delete($this->_sessionName);
         Cookie::delete($this->_cookieName);
@@ -160,10 +160,10 @@ class User
     {
         if ($this->isLoggedIn())
         {
-            $id = $this->data()->user_id;
+            $id = $this->data()->uid;
         }
 
-        if (!$this->_db->delete('users', array('user_id', '=', $id)))
+        if (!$this->_db->delete('users', array('uid', '=', $id)))
         {
             throw new Exception('Unable to update the user.');
         }

@@ -3,7 +3,7 @@ START TRANSACTION;
 SET time_zone = "+00:00";
 
 CREATE TABLE `users` (
-    `user_ID` int(11) NOT NULL AUTO_INCREMENT,
+    `uid` int(11) NOT NULL AUTO_INCREMENT,
     `username` varchar(20) NOT NULL,
     `password` varchar(255) NOT NULL,
     `name` varchar(50) NOT NULL,
@@ -12,10 +12,10 @@ CREATE TABLE `users` (
     `email` varchar(255) NOT NULL,
     `group_ID` int(11) NOT NULL,
 
-    PRIMARY KEY (`user_ID`)
+    PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `users` (`user_ID`, `username`, `password`, `name`, `is_guest`, `joined`, `email`, `group_ID`) VALUES
+INSERT INTO `users` (`uid`, `username`, `password`, `name`, `is_guest`, `joined`, `email`, `group_ID`) VALUES
 (1, 'admin', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Admin', 0, '2019-11-20 00:00:00', '', 1),
 (2, 'Casper', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Casper', 0, '2019-11-20 00:00:00', '', 1),
 (3, 'Gunnar', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Gunnar', 0, '2019-11-20 00:00:00', '', 1),
@@ -103,7 +103,7 @@ CREATE TABLE `cart_items` (
 
 CREATE TABLE `cart` (
     `cart_ID` int(11) NOT NULL AUTO_INCREMENT,    
-    `user_ID` int(11) NOT NULL,
+    `uid` int(11) NOT NULL,
     `total_price` int(11) NOT NULL,
 
     PRIMARY KEY (`cart_ID`)
@@ -120,7 +120,7 @@ CREATE TABLE `order_items` (
 
 CREATE TABLE `order` (
     `order_ID` int(11) NOT NULL AUTO_INCREMENT,
-    `user_ID` int(11) NOT NULL,
+    `uid` int(11) NOT NULL,
     `total` int(11) NOT NULL,
     `order_date` datetime NOT NULL,
 
@@ -139,11 +139,11 @@ ALTER TABLE `cart_items`
     ADD CONSTRAINT `cart_item_ibfk_2` FOREIGN KEY (`cart_ID`) REFERENCES `cart` (`cart_ID`); 
 
 ALTER TABLE `cart`
-    ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_ID`) REFERENCES `users` (`user_ID`);
+    ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`);
 
 ALTER TABLE `order_items`
     ADD CONSTRAINT `order_item_ibfk_1` FOREIGN KEY (`order_ID`) REFERENCES `order` (`order_ID`),
     ADD CONSTRAINT `order_item_ibfk_2` FOREIGN KEY (`product_ID`) REFERENCES `products` (`product_ID`);
 
 ALTER TABLE `order`
-    ADD CONSTRAINT `order_ibfk_1` FOREIGN KEY (`user_ID`) REFERENCES `users` (`user_ID`);
+    ADD CONSTRAINT `order_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`);

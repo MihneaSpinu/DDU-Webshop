@@ -8,7 +8,7 @@ if(Cookie::exists(Config::get('remember/cookie_name')) && !Session::exists(Confi
 
     if($hashCheck->count())
     {
-        $user = new User($hashCheck->first()->user_id);
+        $user = new User($hashCheck->first()->uid);
         $user->login();
     }
 }
