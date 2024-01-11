@@ -7,7 +7,7 @@ $current = $remoteSecret;
 $GLOBALS['config'] = array(
 
     'app' => array(
-        'name'          => 'Forum med Mihnea, Jeppe, Casper, Gunnar',
+        'name'          => 'Webshop med Mihnea, Jeppe, Casper, Gunnar',
     ),
 
     'mysql' => array(

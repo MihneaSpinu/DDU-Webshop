@@ -40,26 +40,14 @@ CREATE TABLE `products` (
     `product_description` varchar(255) NOT NULL,
     `product_price` decimal(10,2) NOT NULL,
     `product_weight` int(11) NOT NULL,
-    `quantity` int(11) NOT NULL,
+    `quantity` int(11) DEFAULT 0,
     `category_ID` int(11) NOT NULL,
-    `discount_ID` int(11) NOT NULL,
+    `color_ID` int(11) NOT NULL DEFAULT 1,
+    `discount_ID` int(11) NOT NULL DEFAULT 1,
 
     PRIMARY KEY (`product_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `products` (`product_ID`, `product_name`, `product_description`, `product_price`, `quantity`, `product_weight`, `category_ID`, `discount_ID`) VALUES
-(1, 'Finite Abys tshirt', 'A tshirt with the Finite Abys logo on it', 100, 10, 10, 1, 1),
-(2, 'Finite Abys hat', 'A hat with the Finite Abys logo on it', 50, 50, 30, 1, 1),
-(3, 'Finite Abys mug', 'A mug with the Finite Abys logo on it', 25, 25, 100, 5, 1),
-(4, 'Finite Abys keychain', 'A keychain with the Finite Abys logo on it', 10, 35, 5, 2, 1),
-(5, 'Finite Abys sticker', 'A sticker with the Finite Abys logo on it', 5, 5, 1, 6, 1),
-(6, 'Finite Abys poster', 'A poster with the Finite Abys logo on it', 15, 15, 10, 5, 1),
-(7, 'Finite Abys plushie', 'A plushie with the Finite Abys logo on it', 200, 20, 150, 4, 1),
-(8, 'Finite Abys socks', 'Socks with the Finite Abys logo on it', 10, 10, 20, 1, 1),
-(9, 'Finite Abys pants', 'Pants with the Finite Abys logo on it', 50, 50, 50, 1, 1),
-(10, 'Finite Abys shoes', 'Shoes with the Finite Abys logo on it', 100, 100, 50, 1, 1),
-(11, 'Finite Abys underwear', 'Underwear with the Finite Abys logo on it', 25, 25, 10, 1, 1),
-(12, 'Finite Abys belt', 'A belt with the Finite Abys logo on it', 25, 25, 30, 1, 1);
 
 CREATE TABLE `categories` (
     `category_ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -69,12 +57,34 @@ CREATE TABLE `categories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `categories` (`category_ID`, `category_name`) VALUES
-(1, 'Clothing'),
-(2, 'Accessories'),
-(3, 'Electronics'),
-(4, 'Toys'),
-(5, 'Home'),
-(6, 'Other');
+(1, 'T-Shirts'),
+(2, 'Hats'),
+(3, 'Hoodies'),
+(4, 'Mouse Pads'),
+(5, 'Mugs'),
+(6, 'Accessories'),
+(7, 'Plushies'),
+(8, 'Posters'),
+(9, 'Stickers');
+
+CREATE TABLE `colors` (
+    `color_ID` int(11) NOT NULL AUTO_INCREMENT,
+    `color_name` varchar(255) NOT NULL,
+
+    PRIMARY KEY (`color_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `colors` (`color_ID`, `color_name`) VALUES
+(1, 'No Color'),
+(2, 'White'),
+(3, 'Black'),
+(4, 'Red'),
+(5, 'Blue'),
+(6, 'Green'),
+(7, 'Yellow'),
+(8, 'Orange'),
+(9, 'Purple'),
+(10, 'Pink');
 
 CREATE TABLE `discounts` (
     `discount_ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -132,7 +142,8 @@ ALTER TABLE `users`
 
 ALTER TABLE `products`
     ADD CONSTRAINT `product_ibfk_1` FOREIGN KEY (`category_ID`) REFERENCES `categories` (`category_ID`),
-    ADD CONSTRAINT `product_ibfk_2` FOREIGN KEY (`discount_ID`) REFERENCES `discounts` (`discount_ID`);
+    ADD CONSTRAINT `product_ibfk_2` FOREIGN KEY (`color_ID`) REFERENCES `colors` (`color_ID`),
+    ADD CONSTRAINT `product_ibfk_3` FOREIGN KEY (`discount_ID`) REFERENCES `discounts` (`discount_ID`);
     
 ALTER TABLE `cart_items`
     ADD CONSTRAINT `cart_item_ibfk_1` FOREIGN KEY (`product_ID`) REFERENCES `products` (`product_ID`),
@@ -147,3 +158,70 @@ ALTER TABLE `order_items`
 
 ALTER TABLE `order`
     ADD CONSTRAINT `order_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`);
+
+DELIMITER //
+
+CREATE PROCEDURE AddColorsToProduct(
+    IN productName VARCHAR(255),
+    IN colorList VARCHAR(255)
+)
+BEGIN
+    DECLARE colorExists INT;
+    DECLARE noColorExists INT;
+
+    -- Check if "no color" exists for the given product name
+    SELECT COUNT(*) INTO noColorExists FROM products
+    WHERE product_name = productName AND color_ID = 1;
+
+    -- If "no color" exists, use the first color to edit the product
+    IF noColorExists > 0 THEN
+        UPDATE products
+        SET color_ID = (SELECT color_ID FROM colors WHERE color_name = TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(colorList, ',', 1), ',', -1)))
+        WHERE product_name = productName AND color_ID = 1;
+        SET @editedProductID = (SELECT product_ID FROM products WHERE product_name = productName AND color_ID = 1 LIMIT 1);
+    ELSE
+        SET @editedProductID = NULL;
+    END IF;
+
+    -- Split the comma-separated list of colors into rows
+    CREATE TEMPORARY TABLE tempColors (colorName VARCHAR(255));
+    INSERT INTO tempColors (colorName) SELECT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(colorList, ',', n.digit), ',', -1)) AS colorName FROM
+    (SELECT @row := @row + 1 AS digit FROM information_schema.COLUMNS, (SELECT @row:=0) r WHERE @row < 100) n
+    WHERE LENGTH(colorList) + 1 - LENGTH(REPLACE(colorList, ',', '')) >= n.digit;
+
+    -- Loop through each color in the temporary table
+    colorLoop: LOOP
+        -- Check if the color already exists for the given product name
+        SELECT COUNT(*) INTO colorExists FROM products
+        WHERE product_name = productName AND color_ID = (SELECT color_ID FROM colors WHERE color_name = (SELECT colorName FROM tempColors LIMIT 1));
+
+        -- If the color does not exist, insert a new product entry with that color
+        IF colorExists = 0 THEN
+            IF @editedProductID IS NULL THEN
+                INSERT INTO products (product_name, product_description, product_price, product_weight, category_ID, color_ID, discount_ID, quantity)
+                SELECT productName, product_description, product_price, product_weight, category_ID, color_ID, discount_ID, FLOOR(RAND() *(30 -10 + 1)) + 10
+                FROM products WHERE product_name = productName LIMIT 1;
+                SET @newProductID = LAST_INSERT_ID();
+            ELSE
+                SET @newProductID = @editedProductID;
+            END IF;
+
+            UPDATE products
+            SET color_ID = (SELECT color_ID FROM colors WHERE color_name = (SELECT colorName FROM tempColors LIMIT 1))
+            WHERE product_ID = @newProductID;
+        END IF;
+
+        -- Remove the processed color from the temporary table
+        DELETE FROM tempColors LIMIT 1;
+
+        -- Exit the loop if there are no more colors
+        IF (SELECT COUNT(*) FROM tempColors) = 0 THEN
+            LEAVE colorLoop;
+        END IF;
+    END LOOP;
+
+    -- Drop the temporary table
+    DROP TEMPORARY TABLE IF EXISTS tempColors;
+END //
+
+DELIMITER ;
