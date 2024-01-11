@@ -14,5 +14,14 @@ if (Input::get('id')) {
 
 $name = $product->product_name;
 
-$colors = Product::defineColors($name);
+$colorNames = [];
+foreach (Product::defineColors($name) as $color) {
+    $colorNames[] = $color->color_name;
+}
 $imagePaths = Product::defineImagePaths($name);
+
+if (count($colorNames) > 1) {
+    $displaySelect = "block";
+} else {
+    $displaySelect = "none";
+}

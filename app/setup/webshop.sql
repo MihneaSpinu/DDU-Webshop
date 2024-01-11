@@ -19,20 +19,21 @@ INSERT INTO `users` (`uid`, `username`, `password`, `name`, `is_guest`, `joined`
 (1, 'admin', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Admin', 0, '2019-11-20 00:00:00', '', 1),
 (2, 'Casper', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Casper', 0, '2019-11-20 00:00:00', '', 1),
 (3, 'Gunnar', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Gunnar', 0, '2019-11-20 00:00:00', '', 1),
-(4, 'Jesper', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Jesper', 0, '2019-11-20 00:00:00', '', 1),
-(5, 'Mihnea', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Mihnea', 0, '2019-11-20 00:00:00', '', 1),
-(6, 'Jeppe', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Jeppe', 0, '2019-11-20 00:00:00', '', 1);
+(4, 'Mihnea', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Mihnea', 0, '2019-11-20 00:00:00', '', 1),
+(5, 'Jeppe', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Jeppe', 0, '2019-11-20 00:00:00', '', 1),
+(6, 'Jesper', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Jesper', 0, '2019-11-20 00:00:00', '', 2);
 
 CREATE TABLE `groups` (
     `group_ID` int(11) NOT NULL AUTO_INCREMENT,
-    `group_name` varchar(20) NOT NULL,
+    `permissions` json NOT NULL,
 
     PRIMARY KEY (`group_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `groups` (`group_ID`, `group_name`) VALUES
-(1, 'Admin'),
-(2, 'User');
+INSERT INTO `groups` (`group_ID`, `permissions`) VALUES
+(1, '{"admin":1,"moderator":1,"user":1,"guest":1}'),
+(2, '{"admin":0,"moderator":0,"user":1,"guest":1}'),
+(3, '{"admin":0,"moderator":0,"user":0,"guest":1}');
 
 CREATE TABLE `products` (
     `product_ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -128,7 +129,7 @@ CREATE TABLE `order_items` (
     PRIMARY KEY (`order_item_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `order` (
+CREATE TABLE `orders` (
     `order_ID` int(11) NOT NULL AUTO_INCREMENT,
     `uid` int(11) NOT NULL,
     `total` int(11) NOT NULL,
@@ -153,10 +154,10 @@ ALTER TABLE `cart`
     ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`);
 
 ALTER TABLE `order_items`
-    ADD CONSTRAINT `order_item_ibfk_1` FOREIGN KEY (`order_ID`) REFERENCES `order` (`order_ID`),
+    ADD CONSTRAINT `order_item_ibfk_1` FOREIGN KEY (`order_ID`) REFERENCES `orders` (`order_ID`),
     ADD CONSTRAINT `order_item_ibfk_2` FOREIGN KEY (`product_ID`) REFERENCES `products` (`product_ID`);
 
-ALTER TABLE `order`
+ALTER TABLE `orders`
     ADD CONSTRAINT `order_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`);
 
 DELIMITER //

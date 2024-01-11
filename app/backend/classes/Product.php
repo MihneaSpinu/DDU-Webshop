@@ -28,18 +28,19 @@ class Product
     {
         $colors = [];
 
-        // Get all the colors for the product
-        //SELECT color_ID FROM products WHERE product_name = :productName";
+        // Get all the colors for the product as objects
         $query = Database::getInstance()->query("SELECT color_ID FROM products WHERE product_name = ?", array($productName));
         $colorIDs = $query->results();
 
         foreach ($colorIDs as $colorID) {
-            $colorQuery = Database::getInstance()->query("SELECT color_name FROM colors WHERE color_ID = ?", array($colorID->color_ID));
+            $colorQuery = Database::getInstance()->query("SELECT * FROM colors WHERE color_ID = ?", array($colorID->color_ID));
             $colorResult = $colorQuery->first();
 
-            if ($colorResult) {
-                $colors[] = $colorResult->color_name;
+            // If the color is not already in the array, add it, not name
+            if (!in_array($colorResult->color_name, $colors)) {
+                $colors[] = $colorResult;
             }
+            
         }
 
         return $colors;
@@ -55,27 +56,34 @@ class Product
                 $imagePaths['no color'] = 'app/frontend/assets/productImages/' . $productName . '.png';
             } else {
                 foreach ($colors as $color) {
-                    $imagePaths[$color] = 'app/frontend/assets/productImages/' . $productName . '-' . $color . '.png';
+                    $imagePaths[$color->color_name] = 'app/frontend/assets/productImages/' . $productName . '-' . $color->color_name . '.png';
+                }
+            }
+
+            //Check if the image exists
+            foreach ($imagePaths as $color->color_name => $imagePath) {
+                if (!file_exists($imagePath)) {
+                    //If it doesn't, display a placeholder image
+                    $imagePaths[$color->color_name] = 'app/frontend/assets/productImages/placeholder.png';
                 }
             }
 
             return $imagePaths;
+
         } catch (Exception $e) {
             // Handle the exception (e.g., log it or display an error message)
             throw new Exception('Error defining image paths: ' . $e->getMessage());
         }
     }
-
-
-    public static function displayImage($imagePath)
-    {
-        // Check if the image exists
-        if (file_exists($imagePath)) {
-            // If it does, display it
-            echo '<img src="' . $imagePath . '" alt="Product Image">';
-        } else {
-            // If it doesn't, display a placeholder image
-            echo '<img src="app/frontend/assets/productImages/placeholder.png" alt="Placeholder Image">';
-        }
-    }
+    // public static function displayImage($imagePath)
+    // {
+    //     // Check if the image exists
+    //     if (file_exists($imagePath)) {
+    //         // If it does, display it
+    //         echo '<img src="' . $imagePath . '" alt="Product Image">';
+    //     } else {
+    //         // If it doesn't, display a placeholder image
+    //         echo '<img src="app/frontend/assets/productImages/placeholder.png" alt="Placeholder Image">';
+    //     }
+    // }
 }
