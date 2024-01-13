@@ -9,13 +9,14 @@ if (!$user->isLoggedIn() || !$user->hasPermission('admin')) {
 
 // Retrieve distinct product names
 $products = Database::getInstance()->query("SELECT DISTINCT product_name FROM products ORDER BY category_ID, product_name")->results();
+$chosenProduct = null;
 
 // Retrieve all users
-$users = Database::getInstance()->query("SELECT * FROM users")->results();
+$users = Database::getInstance()->get('users', array('uid', '>', 0))->results();
 
 // Retrieve all orders if any
 $ordersCount = Database::getInstance()->query("SELECT COUNT(*) FROM orders")->first()->{'COUNT(*)'};
-$orders = $ordersCount > 0 ? Database::getInstance()->query("SELECT * FROM orders")->results() : array();
+$orders = $ordersCount > 0 ? Database::getInstance()->query("SELECT * FROM orders ORDER BY order_date DESC")->results() : array();
 
 // Retrieve All months with orders
 $monthsWithOrders = array();
@@ -36,34 +37,48 @@ foreach ($orders as $order) {
 if (Input::exists()) {
     if (isset($_POST['productSubmit'])) {
         // PRODUCT SELECTION --------------------------------------------
-        $chosenProduct = Database::getInstance()->query("SELECT * FROM products WHERE product_name = ?", array(Input::get('selectedProduct')))->first();
-        $category_name = Database::getInstance()->query("SELECT category_name FROM categories WHERE category_ID = ?", array($chosenProduct->category_ID))->first()->category_name;
+        $chosenProduct = Database::getInstance()->get('products', array('product_name', '=', Input::get('selectedProduct')))->first();
+        $category_name = Database::getInstance()->get('categories', array('category_ID', '=', $chosenProduct->category_ID))->first()->category_name;
 
         $colors = Product::defineColors($chosenProduct->product_name);
-        $colorNames = array_column($colors, 'color_name');
+        $colorsHTML = '';
+        foreach ($colors as $color) {
+            $colorsHTML .= $color->color_name . "<br>";
+        }
+        $color->colorsHTML = $colorsHTML;
 
-        $discount_name = Database::getInstance()->query("SELECT discount_name FROM discounts WHERE discount_ID = ?", array($chosenProduct->discount_ID))->first()->discount_name;
+        $discount_name = Database::getInstance()->get('discounts', array('discount_ID', '=', $chosenProduct->discount_ID))->first()->discount_name;
     } elseif (isset($_POST['userSubmit'])) {
         // USER SELECTION -----------------------------------------------
-        $selectedUser = Database::getInstance()->query("SELECT * FROM users WHERE username = ?", array(Input::get('selectedUser')))->first();
-        $amountOfOrders = Database::getInstance()->query("SELECT COUNT(*) FROM orders WHERE uid = ?", array($selectedUser->uid))->first()->{'COUNT(*)'};
-        $usernames = array_column($users, 'username');
+        $selectedUser = Database::getInstance()->get('users', array('username', '=', Input::get('selectedUser')))->first();
 
-        $groups = Database::getInstance()->query("SELECT * FROM groups")->results();
+        $amountOfOrders = Database::getInstance()->query("SELECT COUNT(*) FROM orders WHERE uid = ?", array($selectedUser->uid))->first()->{'COUNT(*)'};
+
+        $groups = Database::getInstance()->get('groups', array('id', '>', 0))->results();
         $groupPerms = array_column($groups, 'permissions');
     } elseif (isset($_POST['monthSubmit'])) {
         // MONTH SELECTION FOR ORDERS ----------------------------------------------
         $selectedMonth = Input::get('selectedMonth');
         $selectedMonthFormatted = date('F Y', strtotime($selectedMonth));
-        foreach ($orders as $order) {
+        foreach ($monthsWithOrders[$selectedMonth] as $order) {
             // Retrieve the username from the order
-            $order->username = Database::getInstance()->query("SELECT username FROM users WHERE uid = ?", array($order->uid))->first()->username;
-        }
-    }
+            $order->username = Database::getInstance()->get('users', array('uid', '=', $order->uid))->first()->username;
 
-    if (isset($_POST['editProductSubmit'])) {
-    } elseif (isset($_POST['deleteProductSubmit'])) {
-    } elseif (isset($_POST['editUserSubmit'])) {
-    } elseif (isset($_POST['deleteUserSubmit'])) {
+            // Retrieve the order items for the specific order
+            $orderItems = Database::getInstance()->get('order_items', array('order_ID', '=', $order->order_ID))->results();
+
+            // Process and display order items
+            $itemsHTML = '';
+            foreach ($orderItems as $orderItem) {
+                // Retrieve product details for each order item
+                $orderedProduct = Database::getInstance()->get('products', array('product_ID', '=', $orderItem->product_ID))->first();
+
+                // Build the HTML for displaying order items
+                $itemsHTML .= "x" . $orderItem->quantity . " " . $orderedProduct->product_name . " || " . $orderedProduct->product_price . "dkk" . "<br>";
+            }
+
+            // Assign the items HTML to the order object for display
+            $order->itemsHTML = $itemsHTML;
+        }
     }
 }

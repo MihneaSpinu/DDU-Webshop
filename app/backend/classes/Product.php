@@ -9,12 +9,17 @@ class Product
         }
     }
 
-    public function delete($id)
-    {
-        if (!Database::getInstance()->delete('products', array('id', '=', $id))) {
-            throw new Exception('There was a problem deleting the product.');
-        }
-    }
+    // public function delete($id)
+    // {
+    //     if (!Database::getInstance()->delete('products', array('id', '=', $id))) {
+    //         throw new Exception('There was a problem deleting the product.');
+    //     }
+    // }
+
+    // public function update($id, $fields)
+    // {
+        
+    // }
 
     public static function getProduct($id)
     {
@@ -40,7 +45,6 @@ class Product
             if (!in_array($colorResult->color_name, $colors)) {
                 $colors[] = $colorResult;
             }
-            
         }
 
         return $colors;
@@ -69,7 +73,6 @@ class Product
             }
 
             return $imagePaths;
-
         } catch (Exception $e) {
             // Handle the exception (e.g., log it or display an error message)
             throw new Exception('Error defining image paths: ' . $e->getMessage());

@@ -56,6 +56,19 @@ class User
         }
     }
 
+    public function delete($id = null)
+    {
+        if (!$id && $this->isLoggedIn())
+        {
+            $id = $this->data()->uid;
+        }
+
+        if (!$this->_db->delete('users', array('uid', '=', $id)))
+        {
+            throw new Exception('Unable to update the user.');
+        }
+    }
+
     public function find($user = null)
     {
         if ($user)
@@ -166,6 +179,15 @@ class User
         if (!$this->_db->delete('users', array('uid', '=', $id)))
         {
             throw new Exception('Unable to update the user.');
+        }
+    }
+
+    //get user
+    public function getUser($id)
+    {
+        $user = Database::getInstance()->get('users', array('uid', '=', $id));
+        if ($user->count()) {
+            return $user->first();
         }
     }
 }
