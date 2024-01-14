@@ -312,3 +312,11 @@ UPDATE
     products
 SET
     quantity = FLOOR(RAND() *(30 -10 + 1)) + 10;
+
+INSERT INTO `users` (`uid`, `username`, `password`, `name`, `is_guest`, `joined`, `email`, `group_ID`) VALUES
+(1, 'admin', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Admin', 0, '2019-11-20 00:00:00', '', 1),
+(2, 'Casper', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Casper', 0, '2019-11-20 00:00:00', '', 1),
+(3, 'Gunnar', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Gunnar', 0, '2019-11-20 00:00:00', '', 1),
+(4, 'Mihnea', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Mihnea', 0, '2019-11-20 00:00:00', '', 1),
+(5, 'Jeppe', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Jeppe', 0, '2019-11-20 00:00:00', '', 1),
+(6, 'Jesper', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Jesper', 0, '2019-11-20 00:00:00', '', 2);

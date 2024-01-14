@@ -15,14 +15,6 @@ CREATE TABLE `users` (
     PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `users` (`uid`, `username`, `password`, `name`, `is_guest`, `joined`, `email`, `group_ID`) VALUES
-(1, 'admin', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Admin', 0, '2019-11-20 00:00:00', '', 1),
-(2, 'Casper', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Casper', 0, '2019-11-20 00:00:00', '', 1),
-(3, 'Gunnar', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Gunnar', 0, '2019-11-20 00:00:00', '', 1),
-(4, 'Mihnea', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Mihnea', 0, '2019-11-20 00:00:00', '', 1),
-(5, 'Jeppe', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Jeppe', 0, '2019-11-20 00:00:00', '', 1),
-(6, 'Jesper', '$2y$10$qaEEEemHqZoY0K7CzylbfuXs4CeG2v9jHAjC4uQKPFUgaO3y4NS6O', 'Jesper', 0, '2019-11-20 00:00:00', '', 2);
-
 CREATE TABLE `groups` (
     `group_ID` int(11) NOT NULL AUTO_INCREMENT,
     `permissions` json NOT NULL,
@@ -44,6 +36,7 @@ CREATE TABLE `products` (
     `quantity` int(11) DEFAULT 0,
     `category_ID` int(11) NOT NULL,
     `color_ID` int(11) NOT NULL DEFAULT 1,
+    `size_ID` int(11) NOT NULL DEFAULT 1,
     `discount_ID` int(11) NOT NULL DEFAULT 1,
 
     PRIMARY KEY (`product_ID`)
@@ -87,6 +80,22 @@ INSERT INTO `colors` (`color_ID`, `color_name`) VALUES
 (9, 'Purple'),
 (10, 'Pink');
 
+CREATE TABLE `sizes` (
+    `size_ID` int(11) NOT NULL AUTO_INCREMENT,
+    `size_name` varchar(255) NOT NULL,
+
+    PRIMARY KEY (`size_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `sizes` (`size_ID`, `size_name`) VALUES
+(1, 'No Size'),
+(2, 'XS'),
+(3, 'S'),
+(4, 'M'),
+(5, 'L'),
+(6, 'XL'),
+(7, 'XXL');
+
 CREATE TABLE `discounts` (
     `discount_ID` int(11) NOT NULL AUTO_INCREMENT,
     `discount_name` varchar(255) NOT NULL,
@@ -112,12 +121,13 @@ CREATE TABLE `cart_items` (
     PRIMARY KEY (`cart_item_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `cart` (
+CREATE TABLE `carts` (
     `cart_ID` int(11) NOT NULL AUTO_INCREMENT,    
     `uid` int(11) NOT NULL,
     `total_price` int(11) NOT NULL,
 
-    PRIMARY KEY (`cart_ID`)
+    PRIMARY KEY (`cart_ID`),
+    UNIQUE KEY (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `order_items` (
@@ -144,13 +154,14 @@ ALTER TABLE `users`
 ALTER TABLE `products`
     ADD CONSTRAINT `product_ibfk_1` FOREIGN KEY (`category_ID`) REFERENCES `categories` (`category_ID`),
     ADD CONSTRAINT `product_ibfk_2` FOREIGN KEY (`color_ID`) REFERENCES `colors` (`color_ID`),
-    ADD CONSTRAINT `product_ibfk_3` FOREIGN KEY (`discount_ID`) REFERENCES `discounts` (`discount_ID`);
+    ADD CONSTRAINT `product_ibfk_3` FOREIGN KEY (`size_ID`) REFERENCES `sizes` (`size_ID`),
+    ADD CONSTRAINT `product_ibfk_4` FOREIGN KEY (`discount_ID`) REFERENCES `discounts` (`discount_ID`);
     
 ALTER TABLE `cart_items`
     ADD CONSTRAINT `cart_item_ibfk_1` FOREIGN KEY (`product_ID`) REFERENCES `products` (`product_ID`),
-    ADD CONSTRAINT `cart_item_ibfk_2` FOREIGN KEY (`cart_ID`) REFERENCES `cart` (`cart_ID`); 
+    ADD CONSTRAINT `cart_item_ibfk_2` FOREIGN KEY (`cart_ID`) REFERENCES `carts` (`cart_ID`); 
 
-ALTER TABLE `cart`
+ALTER TABLE `carts`
     ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`);
 
 ALTER TABLE `order_items`
@@ -224,5 +235,153 @@ BEGIN
     -- Drop the temporary table
     DROP TEMPORARY TABLE IF EXISTS tempColors;
 END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE AddSizesToProduct(
+    IN productName VARCHAR(255),
+    IN sizeList VARCHAR(255)
+)
+BEGIN
+    DECLARE sizeExists INT;
+    DECLARE colorIdValue INT;
+    DECLARE sizeIdValue INT;
+    DECLARE newProductID INT;
+
+    -- Get the distinct color_IDs for the given product name
+    CREATE TEMPORARY TABLE tempColors (colorID INT);
+    INSERT INTO tempColors (colorID) SELECT DISTINCT color_ID FROM products WHERE product_name = productName;
+
+    -- Loop through each color_ID in the temporary table
+    colorLoop: LOOP
+        -- Get the color_ID for the current iteration
+        SET colorIdValue = (SELECT colorID FROM tempColors LIMIT 1);
+
+        -- Check if "no size" exists for the given product name and color
+        SELECT COUNT(*) INTO sizeExists FROM products
+        WHERE product_name = productName AND color_ID = colorIdValue AND size_ID = 1;
+
+        -- If "no size" exists, set the sizeIdValue to the first size in the size list
+        IF sizeExists > 0 THEN
+            SET sizeIdValue = (SELECT size_ID FROM sizes WHERE size_name = TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(sizeList, ',', 1), ',', -1)));
+            -- Update "no size" entry with the new size
+            UPDATE products
+            SET size_ID = sizeIdValue
+            WHERE product_name = productName AND color_ID = colorIdValue AND size_ID = 1;
+            SET newProductID = (SELECT product_ID FROM products WHERE product_name = productName AND color_ID = colorIdValue AND size_ID = sizeIdValue LIMIT 1);
+        ELSE
+            SET sizeIdValue = (SELECT size_ID FROM sizes WHERE size_name = TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(sizeList, ',', 1), ',', -1)));
+            SET newProductID = NULL;
+        END IF;
+
+        -- Split the comma-separated list of sizes into rows
+        CREATE TEMPORARY TABLE tempSizes (sizeName VARCHAR(255));
+        INSERT INTO tempSizes (sizeName) SELECT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(sizeList, ',', n.digit), ',', -1)) AS sizeName FROM
+        (SELECT @row := @row + 1 AS digit FROM information_schema.COLUMNS, (SELECT @row:=0) r WHERE @row < 100) n
+        WHERE LENGTH(sizeList) + 1 - LENGTH(REPLACE(sizeList, ',', '')) >= n.digit;
+
+        -- Loop through each size in the temporary table
+        sizeLoop: LOOP
+            -- Get the size_ID for the current iteration
+            SET sizeIdValue = (SELECT size_ID FROM sizes WHERE size_name = (SELECT sizeName FROM tempSizes LIMIT 1));
+
+            -- Check if the size already exists for the given product name and color
+            SELECT COUNT(*) INTO sizeExists FROM products
+            WHERE product_name = productName AND color_ID = colorIdValue AND size_ID = sizeIdValue;
+
+            -- If the size does not exist, insert a new product entry with that size
+            IF sizeExists = 0 THEN
+                IF newProductID IS NULL THEN
+                    INSERT INTO products (product_name, product_description, product_price, product_weight, category_ID, color_ID, size_ID, discount_ID, quantity)
+                    SELECT productName, product_description, product_price, product_weight, category_ID, colorIdValue, sizeIdValue, discount_ID, FLOOR(RAND() * (30 - 10 + 1)) + 10
+                    FROM products WHERE product_name = productName AND color_ID = colorIdValue LIMIT 1;
+                    SET newProductID = LAST_INSERT_ID();
+                END IF;
+
+                UPDATE products
+                SET size_ID = sizeIdValue
+                WHERE product_ID = newProductID;
+            END IF;
+
+            -- Remove the processed size from the temporary table
+            DELETE FROM tempSizes LIMIT 1;
+
+            -- Exit the size loop if there are no more sizes
+            IF (SELECT COUNT(*) FROM tempSizes) = 0 THEN
+                LEAVE sizeLoop;
+            END IF;
+        END LOOP;
+
+        -- Drop the temporary size table
+        DROP TEMPORARY TABLE IF EXISTS tempSizes;
+
+        -- Remove the processed color from the temporary table
+        DELETE FROM tempColors LIMIT 1;
+
+        -- Exit the color loop if there are no more colors
+        IF (SELECT COUNT(*) FROM tempColors) = 0 THEN
+            LEAVE colorLoop;
+        END IF;
+    END LOOP;
+
+    -- Drop the temporary color table
+    DROP TEMPORARY TABLE IF EXISTS tempColors;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER after_user_insert
+AFTER INSERT ON users FOR EACH ROW
+BEGIN
+    INSERT INTO carts (uid, total_price) VALUES (NEW.uid, 0);
+END;
+
+//
+
+DELIMITER ;
+
+-- Trigger to update total price when a new cart item is inserted
+DELIMITER //
+
+CREATE TRIGGER after_cart_item_insert
+AFTER INSERT ON cart_items FOR EACH ROW
+BEGIN
+    DECLARE itemPrice DECIMAL(10, 2);
+    
+    -- Get the price of the product for the inserted cart item
+    SELECT product_price * NEW.quantity INTO itemPrice
+    FROM products
+    WHERE product_ID = NEW.product_ID;
+
+    -- Update the total price of the cart
+    UPDATE carts
+    SET total_price = total_price + itemPrice
+    WHERE cart_ID = NEW.cart_ID;
+END;
+
+//
+
+-- Trigger to update total price when a cart item is removed
+CREATE TRIGGER after_cart_item_delete
+AFTER DELETE ON cart_items FOR EACH ROW
+BEGIN
+    DECLARE itemPrice DECIMAL(10, 2);
+
+    -- Get the price of the product for the deleted cart item
+    SELECT product_price * OLD.quantity INTO itemPrice
+    FROM products
+    WHERE product_ID = OLD.product_ID;
+
+    -- Update the total price of the cart
+    UPDATE carts
+    SET total_price = total_price - itemPrice
+    WHERE cart_ID = OLD.cart_ID;
+END;
+
+//
 
 DELIMITER ;

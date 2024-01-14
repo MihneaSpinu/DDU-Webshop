@@ -9,18 +9,6 @@ class Product
         }
     }
 
-    // public function delete($id)
-    // {
-    //     if (!Database::getInstance()->delete('products', array('id', '=', $id))) {
-    //         throw new Exception('There was a problem deleting the product.');
-    //     }
-    // }
-
-    // public function update($id, $fields)
-    // {
-        
-    // }
-
     public static function getProduct($id)
     {
         $product = Database::getInstance()->get('products', array('product_ID', '=', $id));
@@ -29,25 +17,43 @@ class Product
         }
     }
 
+    public function addToCart($fields = array())
+    {
+        if (!Database::getInstance()->insert('cart_items', $fields)) {
+            throw new Exception('There was a problem adding the product to the cart.');
+        }
+    }
+
     public static function defineColors($productName)
     {
         $colors = [];
 
         // Get all the colors for the product as objects
-        $query = Database::getInstance()->query("SELECT color_ID FROM products WHERE product_name = ?", array($productName));
+        $query = Database::getInstance()->query("SELECT DISTINCT color_ID FROM products WHERE product_name = ?", array($productName));
         $colorIDs = $query->results();
 
         foreach ($colorIDs as $colorID) {
             $colorQuery = Database::getInstance()->query("SELECT * FROM colors WHERE color_ID = ?", array($colorID->color_ID));
-            $colorResult = $colorQuery->first();
-
-            // If the color is not already in the array, add it, not name
-            if (!in_array($colorResult->color_name, $colors)) {
-                $colors[] = $colorResult;
-            }
+            $colors[] = $colorQuery->first();
         }
 
         return $colors;
+    }
+
+    public static function defineSizes($productName)
+    {
+        $sizes = [];
+
+        // Get all the sizes for the product as objects, but only get unique ones
+        $query = Database::getInstance()->query("SELECT DISTINCT size_ID FROM products WHERE product_name = ?", array($productName));
+        $sizeIDs = $query->results();
+
+        foreach ($sizeIDs as $sizeID) {
+            $sizeQuery = Database::getInstance()->query("SELECT * FROM sizes WHERE size_ID = ?", array($sizeID->size_ID));
+            $sizes[] = $sizeQuery->first();
+        }
+
+        return $sizes;
     }
 
     public static function defineImagePaths($productName)
@@ -78,15 +84,4 @@ class Product
             throw new Exception('Error defining image paths: ' . $e->getMessage());
         }
     }
-    // public static function displayImage($imagePath)
-    // {
-    //     // Check if the image exists
-    //     if (file_exists($imagePath)) {
-    //         // If it does, display it
-    //         echo '<img src="' . $imagePath . '" alt="Product Image">';
-    //     } else {
-    //         // If it doesn't, display a placeholder image
-    //         echo '<img src="app/frontend/assets/productImages/placeholder.png" alt="Placeholder Image">';
-    //     }
-    // }
 }

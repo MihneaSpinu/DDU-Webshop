@@ -45,7 +45,12 @@ if (Input::exists()) {
         foreach ($colors as $color) {
             $colorsHTML .= $color->color_name . "<br>";
         }
-        $color->colorsHTML = $colorsHTML;
+
+        $sizes = Product::defineSizes($chosenProduct->product_name);
+        $sizesHTML = '';
+        foreach ($sizes as $size) {
+            $sizesHTML .= $size->size_name . "<br>";
+        }
 
         $discount_name = Database::getInstance()->get('discounts', array('discount_ID', '=', $chosenProduct->discount_ID))->first()->discount_name;
     } elseif (isset($_POST['userSubmit'])) {
@@ -54,7 +59,7 @@ if (Input::exists()) {
 
         $amountOfOrders = Database::getInstance()->query("SELECT COUNT(*) FROM orders WHERE uid = ?", array($selectedUser->uid))->first()->{'COUNT(*)'};
 
-        $groups = Database::getInstance()->get('groups', array('id', '>', 0))->results();
+        $groups = Database::getInstance()->get('groups', array('group_ID', '>', 0))->results();
         $groupPerms = array_column($groups, 'permissions');
     } elseif (isset($_POST['monthSubmit'])) {
         // MONTH SELECTION FOR ORDERS ----------------------------------------------
@@ -76,9 +81,6 @@ if (Input::exists()) {
                 // Build the HTML for displaying order items
                 $itemsHTML .= "x" . $orderItem->quantity . " " . $orderedProduct->product_name . " || " . $orderedProduct->product_price . "dkk" . "<br>";
             }
-
-            // Assign the items HTML to the order object for display
-            $order->itemsHTML = $itemsHTML;
         }
     }
 }

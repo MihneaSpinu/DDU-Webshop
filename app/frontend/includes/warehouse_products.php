@@ -24,6 +24,7 @@
                 <th>Quantity</th>
                 <th>Category</th>
                 <th>Color</th>
+                <th>Size</th>
                 <th>Discount</th>
             </tr>
         </thead>
@@ -36,7 +37,8 @@
                 <td><?php echo $chosenProduct->product_weight . "g"; ?></td>
                 <td><?php echo $chosenProduct->quantity; ?></td>
                 <td><?php echo $category_name; ?></td>
-                <td><?php echo $color->colorsHTML; ?></td>
+                <td><?php echo $colorsHTML; ?></td>
+                <td><?php echo $sizesHTML; ?></td>
                 <td><?php echo $discount_name; ?></td>
             </tr>
         </tbody>

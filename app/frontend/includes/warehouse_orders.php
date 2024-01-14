@@ -37,7 +37,7 @@
                 <tr>
                     <td><?php echo $order->order_ID; ?></td>
                     <td><?php echo $order->order_date; ?></td>
-                    <td><?php echo $order->itemsHTML; ?></td>
+                    <td><?php echo $itemsHTML; ?></td>
                     <td><?php echo $order->total . "dkk"; ?></td>
                     <td><?php echo "Uid: " . $order->uid . " || Username: " . $order->username; ?></td>
                 </tr>

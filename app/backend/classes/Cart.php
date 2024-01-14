@@ -9,15 +9,6 @@ class Cart
         }
     }
 
-    public static function getCart($id)
-    {
-        // Database::getInstance()->query("SELECT * FROM carts WHERE user_ID = $uid");
-        $cart = Database::getInstance()->get('carts', array('user_ID', '=', $id));
-        if ($cart->count()) {
-            return $cart->results();
-        }
-    }
-
     public function removeFromCart($id)
     {
         if (!Database::getInstance()->delete('carts', array('product_ID', '=', $id))) {

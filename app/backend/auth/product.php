@@ -18,6 +18,21 @@ $colorNames = [];
 foreach (Product::defineColors($name) as $color) {
     $colorNames[] = $color->color_name;
 }
+$colorsHTML = "";
+foreach ($colorNames as $color) {
+    $colorsHTML .= "<option value='" . $color . "'>" . $color . "</option>";
+}
+
+$sizeNames = [];
+foreach (Product::defineSizes($name) as $size) {
+    $sizeNames[] = $size->size_name;
+}
+var_dump($sizeNames);
+$sizesHTML = "";
+foreach ($sizeNames as $size) {
+    $sizesHTML .= "<option value='" . $size . "'>" . $size . "</option>";
+}
+
 $imagePaths = Product::defineImagePaths($name);
 
 if (count($colorNames) > 1) {
