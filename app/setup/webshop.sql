@@ -15,6 +15,14 @@ CREATE TABLE `users` (
     PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `users_sessions` (
+    `users_session_ID` int(11) NOT NULL AUTO_INCREMENT,
+    `uid` int(11) NOT NULL,
+    `hash` varchar(255) NOT NULL,
+
+    PRIMARY KEY (`users_session_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE `groups` (
     `group_ID` int(11) NOT NULL AUTO_INCREMENT,
     `permissions` json NOT NULL,
@@ -124,7 +132,7 @@ CREATE TABLE `cart_items` (
 CREATE TABLE `carts` (
     `cart_ID` int(11) NOT NULL AUTO_INCREMENT,    
     `uid` int(11) NOT NULL,
-    `total_price` int(11) NOT NULL,
+    `total_price` decimal(10,2) NOT NULL,
 
     PRIMARY KEY (`cart_ID`),
     UNIQUE KEY (`uid`)
@@ -150,6 +158,9 @@ CREATE TABLE `orders` (
 
 ALTER TABLE `users`
     ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`group_ID`) REFERENCES `groups` (`group_ID`);
+
+ALTER TABLE `users_sessions`
+    ADD CONSTRAINT `users_sessions_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`);    
 
 ALTER TABLE `products`
     ADD CONSTRAINT `product_ibfk_1` FOREIGN KEY (`category_ID`) REFERENCES `categories` (`category_ID`),
@@ -181,11 +192,7 @@ END;
 
 //
 
-DELIMITER ;
-
 -- Trigger to update total price when a new cart item is inserted
-DELIMITER //
-
 CREATE TRIGGER after_cart_item_insert
 AFTER INSERT ON cart_items FOR EACH ROW
 BEGIN
@@ -219,6 +226,100 @@ BEGIN
     UPDATE carts
     SET total_price = total_price - itemPrice
     WHERE cart_ID = OLD.cart_ID;
+END;
+
+//
+
+CREATE TRIGGER after_cart_item_update
+AFTER UPDATE ON cart_items FOR EACH ROW
+BEGIN
+    DECLARE itemPrice DECIMAL(10, 2);
+    DECLARE oldItemPrice DECIMAL(10, 2);
+
+    -- Get the price of the product for the updated cart item
+    SELECT product_price * NEW.quantity INTO itemPrice
+    FROM products
+    WHERE product_ID = NEW.product_ID;
+
+    -- Get the price of the product for the old cart item
+    SELECT product_price * OLD.quantity INTO oldItemPrice
+    FROM products
+    WHERE product_ID = OLD.product_ID;
+
+    -- Update the total price of the cart
+    UPDATE carts
+    SET total_price = total_price - oldItemPrice + itemPrice
+    WHERE cart_ID = NEW.cart_ID;
+END;
+
+//
+
+-- Trigger to update total price of cart when a product price is updated
+CREATE TRIGGER after_product_update
+AFTER UPDATE ON products FOR EACH ROW
+BEGIN
+    DECLARE cartID INT(11);
+    DECLARE originalItemPrice DECIMAL(10, 2);
+    DECLARE newItemPrice DECIMAL(10, 2);
+    DECLARE itemQuantity INT(11);
+
+    -- Check if the product price is being updated
+    IF NEW.product_price <> OLD.product_price THEN
+        -- Get the cart ID of the cart that contains the product
+        SELECT cart_ID INTO cartID
+        FROM cart_items
+        WHERE product_ID = NEW.product_ID;
+
+        -- Get the quantity of the product in the cart
+        SELECT quantity INTO itemQuantity
+        FROM cart_items
+        WHERE product_ID = NEW.product_ID;
+
+        -- Get the price of the product before the update
+        SELECT OLD.product_price * quantity INTO originalItemPrice
+        FROM cart_items
+        WHERE product_ID = NEW.product_ID;
+
+        -- Get the price of the product after the update
+        SELECT NEW.product_price * quantity INTO newItemPrice
+        FROM cart_items
+        WHERE product_ID = NEW.product_ID;
+
+        -- Update the total price of the cart
+        UPDATE carts
+        SET total_price = total_price - originalItemPrice + newItemPrice
+        WHERE cart_ID = cartID;
+    END IF;
+END;
+
+//
+
+CREATE TRIGGER before_discount_update
+BEFORE UPDATE ON discounts FOR EACH ROW
+BEGIN
+    IF NEW.active <> OLD.active THEN
+        -- If the active status is changed, update discount percentage in products with the corresponding discount ID
+        IF OLD.active = 1 THEN
+            -- If the old discount was active, revert the product prices to their original values
+            UPDATE products
+            SET product_price = product_price / (1 - OLD.discount_percentage / 100)
+            WHERE discount_ID = OLD.discount_ID;
+        END IF;
+
+        IF NEW.active = 1 THEN
+            -- If the new discount is active, apply the new discount percentage to the product prices
+            UPDATE products
+            SET product_price = product_price * (1 - NEW.discount_percentage / 100)
+            WHERE discount_ID = NEW.discount_ID;
+        END IF;
+    END IF;
+
+    IF NEW.discount_percentage <> OLD.discount_percentage THEN
+        -- If the discount percentage is changed, update product prices with the corresponding discount ID
+        UPDATE products
+        SET product_price = product_price / (1 - OLD.discount_percentage / 100) * (1 - NEW.discount_percentage / 100)
+        WHERE discount_ID = NEW.discount_ID;
+    END IF;
 END;
 
 //

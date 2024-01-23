@@ -13,7 +13,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php echo $productsHTML; ?>
+                    <?php echo $productsHTML;
+                    ?>
                 </tbody>
                 <tfoot>
                     <tr>
@@ -25,3 +26,62 @@
         </div>
     </div>
 </div>
+
+<!-- Checkout button to send user to checkout.php -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <form action="checkout.php" method="post">
+                <input type="submit" value="Checkout" class="btn btn-primary">
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function incrementQuantity(cartItemID) {
+        var quantityField = $("#quantity_" + cartItemID);
+        var currentQuantity = parseInt(quantityField.val());
+        if (currentQuantity <= 99) {
+            quantityField.val(currentQuantity + 1);
+            updateCartItemQuantity(cartItemID, currentQuantity + 1);
+        }
+    }
+
+    function decrementQuantity(cartItemID) {
+        var quantityField = $("#quantity_" + cartItemID);
+        var currentQuantity = parseInt(quantityField.val());
+        if (currentQuantity > 1) {
+            quantityField.val(currentQuantity - 1);
+            updateCartItemQuantity(cartItemID, currentQuantity - 1);
+        }
+    }
+
+    // Add event listener for input changes
+    $(document).on('input', 'input[id^="quantity_"]', function() {
+        //keeo input value between 1 and 99
+        if ($(this).val() < 1) {
+            $(this).val(1);
+        } else if ($(this).val() > 99) {
+            $(this).val(99);
+        }
+        var cartItemID = $(this).attr('id').replace('quantity_', '');
+        var newQuantity = $(this).val();
+        updateCartItemQuantity(cartItemID, newQuantity);
+    });
+
+    function updateCartItemQuantity(cartItemID, newQuantity) {
+        $.ajax({
+            url: "cart.php",
+            type: "POST",
+            data: {
+                cartItemID: cartItemID,
+                newQuantity: newQuantity
+            },
+
+            success: function(response) {
+                window.location.reload();
+            }
+        });
+    }
+</script>
