@@ -1,0 +1,32 @@
+
+body {
+    background-color: rgb(43, 42, 51);
+}
+
+.header {
+    margin-bottom: 0;
+    border-radius: 0;
+    background-size: cover;
+}
+.header .nav-link {
+    color: white;
+    font-weight: bold;
+}
+.header .nav-link:hover {
+    color: grey;
+}
+.navbar, .sidebar {
+    box-shadow: 3px 0px 10px black;
+}
+
+h1, p, ol {
+    color: white;
+    width: fit-content;
+}
+
+footer {
+    color: white;
+}
+.bg-dark a, a, h1, h2, h3, label {
+    color: rgba(255,255,255,.7);
+}
