@@ -70,7 +70,7 @@ VALUES
         2
     ),
     (
-        'Hero Beanie',
+        'Zorg Beanie',
         "A snug, form-fitting beanie. It's not only a great head-warming piece but a staple accessory in anyone's wardrobe.",
         100.00,
         80,

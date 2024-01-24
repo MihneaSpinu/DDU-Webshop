@@ -18,7 +18,7 @@
 </div>
 
 <!-- Choose sizes -->
-<div class="mt-5">
+<div class="mt-5" id="sizeSelector" style="display: <?php echo $sizeSelect; ?>">
     <label for="sizeSelect">Select Size:</label>
     <select name="selectedSize" id="sizeSelect">
         <?php echo $sizesHTML; ?>
@@ -26,7 +26,7 @@
 </div>
 
 <!-- Color Selector. If $displaySelect is false display nothing -->
-<div class="mt-5" id="colorSelector" style="display: <?php echo $displaySelect; ?>;">
+<div class="mt-5" id="colorSelector" style="display: <?php echo $colorSelect; ?>;">
     <label for="colorSelect">Select Color:</label>
     <select name="selectedColor" id="colorSelect" onchange="findColor(options[selectedIndex].value)">
         <?php echo $colorsHTML; ?>

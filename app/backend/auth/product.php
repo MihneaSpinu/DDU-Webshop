@@ -27,7 +27,6 @@ $sizeNames = [];
 foreach (Product::defineSizes($name) as $size) {
     $sizeNames[] = $size->size_name;
 }
-var_dump($sizeNames);
 $sizesHTML = "";
 foreach ($sizeNames as $size) {
     $sizesHTML .= "<option value='" . $size . "'>" . $size . "</option>";
@@ -36,7 +35,12 @@ foreach ($sizeNames as $size) {
 $imagePaths = Product::defineImagePaths($name);
 
 if (count($colorNames) > 1) {
-    $displaySelect = "block";
+    $colorSelect = "block";
 } else {
-    $displaySelect = "none";
+    $colorSelect = "none";
+}
+if (count($sizeNames) > 1) {
+    $sizeSelect = "block";
+} else {
+    $sizeSelect = "none";
 }

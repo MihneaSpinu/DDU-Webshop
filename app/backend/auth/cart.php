@@ -1,6 +1,10 @@
 <?php
 require_once 'app/backend/core/Init.php';
 
+if (!$user->isLoggedIn()) {
+    Redirect::to('index.php');
+}
+
 $sessionUser = $user->data();
 $uid = $sessionUser->uid;
 

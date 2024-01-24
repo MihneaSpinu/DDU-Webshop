@@ -61,20 +61,32 @@ class Product
         try {
             $imagePaths = [];
             $colors = self::defineColors($productName);
+            $imageCount = 0;
 
             if (in_array('no color', $colors)) {
-                $imagePaths['no color'] = 'app/frontend/assets/productImages/' . $productName . '.png';
+                foreach (glob(FRONTEND_ASSET . 'productImages/' . $productName) as $filename) {
+                    $imageCount++;
+                    $imagePaths['no color'] = FRONTEND_ASSET . 'productImages/' . $productName . ' (' . $imageCount . ')' . '.png';
+                }
             } else {
                 foreach ($colors as $color) {
-                    $imagePaths[$color->color_name] = 'app/frontend/assets/productImages/' . $productName . '-' . $color->color_name . '.png';
+                    foreach (glob(FRONTEND_ASSET . 'productImages/' . $productName . '-' . $color->color_name . '.png') as $filename) {
+                        $imageCount++;
+                        $imagePaths[$color->color_name] = FRONTEND_ASSET . 'productImages/' . $productName . '-' . $color->color_name . ' (' . $imageCount . ')' . '.png';
+                    }
                 }
             }
+            var_dump($imageCount);
+            var_dump($imagePaths);
+
+            
+            //dump amount of images with glob product name
 
             //Check if the image exists
             foreach ($imagePaths as $color->color_name => $imagePath) {
                 if (!file_exists($imagePath)) {
                     //If it doesn't, display a placeholder image
-                    $imagePaths[$color->color_name] = 'app/frontend/assets/productImages/placeholder.png';
+                    $imagePaths[$color->color_name] = FRONTEND_ASSET . 'productImages/' . 'placeholder.png';
                 }
             }
 

@@ -118,7 +118,7 @@ INSERT INTO `discounts` (`discount_ID`, `discount_name`, `discount_percentage`, 
 (2, 'Black Friday', 50, 0),
 (3, 'Happy New Year', 25, 0),
 (4, 'Christmas', 25, 0),
-(5, 'Haloween', 5, 1);
+(5, 'Halloween', 5, 1);
 
 CREATE TABLE `cart_items` (
     `cart_item_ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -254,14 +254,36 @@ END;
 
 //
 
--- Trigger to update total price of cart when a product price is updated
-CREATE TRIGGER after_product_update
+CREATE TRIGGER after_product_discount_update
 AFTER UPDATE ON products FOR EACH ROW
 BEGIN
-    DECLARE cartID INT(11);
+    DECLARE oldDiscountPercentage INT;
+    DECLARE newDiscountPercentage INT;
+
+    IF NEW.discount_ID <> OLD.discount_ID THEN
+        SELECT discount_percentage INTO oldDiscountPercentage
+        FROM discounts
+        WHERE discount_ID = OLD.discount_ID;
+
+        SELECT discount_percentage INTO newDiscountPercentage
+        FROM discounts
+        WHERE discount_ID = NEW.discount_ID;               
+
+        -- If the discount ID is changed, update the product price in the cart items
+        UPDATE products
+        SET product_price = product_price / (1 - oldDiscountPercentage / 100) * (1 - newDiscountPercentage / 100)
+        WHERE product_ID = NEW.product_ID;
+    END IF;
+END;
+
+-- Create a trigger to update the total price of the cart when the product price is updated
+CREATE TRIGGER after_product_price_update
+AFTER UPDATE ON products FOR EACH ROW
+BEGIN
+    DECLARE cartID INT;
     DECLARE originalItemPrice DECIMAL(10, 2);
     DECLARE newItemPrice DECIMAL(10, 2);
-    DECLARE itemQuantity INT(11);
+    DECLARE itemQuantity INT;
 
     -- Check if the product price is being updated
     IF NEW.product_price <> OLD.product_price THEN
@@ -289,6 +311,35 @@ BEGIN
         UPDATE carts
         SET total_price = total_price - originalItemPrice + newItemPrice
         WHERE cart_ID = cartID;
+    END IF;
+END;
+
+//
+
+CREATE TRIGGER before_discount_id_update
+BEFORE UPDATE ON products FOR EACH ROW
+BEGIN
+    DECLARE oldDiscountPercentage, newDiscountPercentage, oldActive, newActive INT(11);
+
+    SELECT discount_percentage, active INTO oldDiscountPercentage, oldActive
+    FROM discounts
+    WHERE discount_ID = OLD.discount_ID;
+
+    SELECT discount_percentage, active INTO newDiscountPercentage, newActive
+    FROM discounts
+    WHERE discount_ID = NEW.discount_ID;
+
+    -- Check if the discount ID is being updated
+    IF OLD.discount_ID <> NEW.discount_ID THEN
+        -- Deactivate the old discount for the product
+        IF OLD.discount_ID IS NOT NULL AND oldActive = 1 THEN
+            SET NEW.product_price = NEW.product_price / (1 - oldDiscountPercentage / 100);
+        END IF;
+
+        -- Activate the new discount for the product
+        IF NEW.discount_ID IS NOT NULL AND newActive = 1 THEN
+            SET NEW.product_price = NEW.product_price * (1 - newDiscountPercentage / 100);
+        END IF;
     END IF;
 END;
 
@@ -323,5 +374,98 @@ BEGIN
 END;
 
 //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE addColorsToProduct(IN productName VARCHAR(255), IN colorNames TEXT)
+BEGIN
+    DECLARE colorName VARCHAR(255);
+    DECLARE sizeID INT;
+    DECLARE categoryID INT;
+    DECLARE colorCursor CURSOR FOR SELECT color_name FROM colors WHERE FIND_IN_SET(color_name, colorNames);
+    DECLARE sizeCursor CURSOR FOR SELECT DISTINCT size_ID FROM products WHERE product_name = productName;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET @done = TRUE;
+
+    OPEN sizeCursor;
+
+    size_loop: LOOP
+        FETCH sizeCursor INTO sizeID;
+        IF @done THEN
+            LEAVE size_loop;
+        END IF;
+
+        SET @done = FALSE;
+        OPEN colorCursor;
+
+        color_loop: LOOP
+            FETCH colorCursor INTO colorName;
+            IF @done THEN
+                LEAVE color_loop;
+            END IF;
+
+            SET categoryID = (SELECT category_ID FROM products WHERE product_name = productName AND size_ID = sizeID LIMIT 1);
+
+            IF EXISTS (SELECT 1 FROM products WHERE product_name = productName AND color_ID = 1) THEN
+                UPDATE products SET color_ID = (SELECT color_ID FROM colors WHERE color_name = colorName) WHERE product_name = productName AND color_ID = 1;
+            ELSEIF NOT EXISTS (SELECT 1 FROM products WHERE product_name = productName AND size_ID = sizeID AND color_ID = (SELECT color_ID FROM colors WHERE color_name = colorName) AND category_ID = categoryID) THEN
+                INSERT INTO products (product_name, product_description, product_price, product_weight, quantity, size_ID, color_ID, category_ID, discount_ID) 
+                SELECT product_name, product_description, product_price, product_weight, quantity, size_ID, (SELECT color_ID FROM colors WHERE color_name = colorName), category_ID, discount_ID
+                FROM products WHERE product_name = productName AND size_ID = sizeID LIMIT 1;
+            END IF;
+        END LOOP;
+
+        CLOSE colorCursor;
+        SET @done = FALSE;
+    END LOOP;
+
+    CLOSE sizeCursor;
+END //
+
+DELIMITER //
+
+CREATE PROCEDURE addSizesToProduct(IN productName VARCHAR(255), IN sizeNames TEXT)
+BEGIN
+    DECLARE sizeName VARCHAR(255);
+    DECLARE colorID INT;
+    DECLARE categoryID INT;
+    DECLARE sizeCursor CURSOR FOR SELECT size_name FROM sizes WHERE FIND_IN_SET(size_name, sizeNames);
+    DECLARE colorCursor CURSOR FOR SELECT DISTINCT color_ID FROM products WHERE product_name = productName;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET @done = TRUE;
+
+    OPEN colorCursor;
+
+    color_loop: LOOP
+        FETCH colorCursor INTO colorID;
+        IF @done THEN
+            LEAVE color_loop;
+        END IF;
+
+        SET @done = FALSE;
+        OPEN sizeCursor;
+
+        size_loop: LOOP
+            FETCH sizeCursor INTO sizeName;
+            IF @done THEN
+                LEAVE size_loop;
+            END IF;
+
+            SET categoryID = (SELECT category_ID FROM products WHERE product_name = productName AND color_ID = colorID LIMIT 1);
+            IF EXISTS (SELECT 1 FROM products WHERE product_name = productName AND size_ID = 1) THEN
+                UPDATE products SET size_ID = (SELECT size_ID FROM sizes WHERE size_name = sizeName) WHERE product_name = productName AND size_ID = 1;
+            ELSEIF NOT EXISTS (SELECT 1 FROM products WHERE product_name = productName AND color_ID = colorID AND size_ID = (SELECT size_ID FROM sizes WHERE size_name = sizeName) AND category_ID = categoryID) THEN
+                INSERT INTO products (product_name, product_description, product_price, product_weight, quantity, color_ID, size_ID, category_ID, discount_ID) 
+                SELECT product_name, product_description, product_price, product_weight, quantity, color_ID, (SELECT size_ID FROM sizes WHERE size_name = sizeName), category_ID, discount_ID
+                FROM products WHERE product_name = productName AND color_ID = colorID LIMIT 1;
+            END IF;
+        END LOOP;
+
+        CLOSE sizeCursor;
+        SET @done = FALSE;
+    END LOOP;
+
+    CLOSE colorCursor;
+END //
 
 DELIMITER ;
