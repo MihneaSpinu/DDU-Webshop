@@ -276,6 +276,8 @@ BEGIN
     END IF;
 END;
 
+//
+
 -- Create a trigger to update the total price of the cart when the product price is updated
 CREATE TRIGGER after_product_price_update
 AFTER UPDATE ON products FOR EACH ROW
@@ -336,8 +338,8 @@ BEGIN
             SET NEW.product_price = NEW.product_price / (1 - oldDiscountPercentage / 100);
         END IF;
 
-        -- Activate the new discount for the product
-        IF NEW.discount_ID IS NOT NULL AND newActive = 1 THEN
+        -- Apply the new discount for the product, regardless of whether it's active or not
+        IF NEW.discount_ID IS NOT NULL THEN
             SET NEW.product_price = NEW.product_price * (1 - newDiscountPercentage / 100);
         END IF;
     END IF;
@@ -468,4 +470,51 @@ BEGIN
     CLOSE colorCursor;
 END //
 
+DELIMITER //
+
+CREATE PROCEDURE randomQuantity()
+BEGIN
+    DECLARE productID INT;
+    DECLARE quantity INT;
+    DECLARE productCursor CURSOR FOR SELECT product_ID FROM products;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET @done = TRUE;
+
+    OPEN productCursor;
+
+    product_loop: LOOP
+        FETCH productCursor INTO productID;
+        IF @done THEN
+            LEAVE product_loop;
+        END IF;
+
+        SET @done = FALSE;
+        SET quantity = FLOOR(RAND() *(30 -10 + 1)) + 10;
+        UPDATE products SET quantity = quantity WHERE product_ID = productID;
+    END LOOP;
+
+    CLOSE productCursor;
+END //
+
+DELIMITER //
+
+CREATE PROCEDURE updateDiscount(IN productName VARCHAR(255), IN discountName VARCHAR(255))
+BEGIN
+    DECLARE discountID INT;
+    SELECT discount_ID INTO discountID FROM discounts WHERE discount_name = discountName;
+    UPDATE products SET discount_ID = discountID WHERE product_name = productName;
+END //
+
 DELIMITER ;
+
+CALL updateDiscount('BroomSweep Logo Shirt', 'Black Friday');
+
+--Update discount id of broomsweep logo shirt to 5
+UPDATE products SET discount_ID = 5 WHERE product_name = 'BroomSweep Logo Shirt';
+
+--BroomSweep Logo Shirt, Hero shirt, Vilain shirt. All colors, all sizes
+CALL addColorsToProduct('BroomSweep Logo Shirt', 'White,Black,Red,Blue,Green,Yellow,Orange,Purple,Pink');
+CALL addColorsToProduct('Hero Shirt', 'White,Black,Red,Blue,Green,Yellow,Orange,Purple,Pink');
+CALL addColorsToProduct('Vilain Shirt', 'White,Black,Red,Blue,Green,Yellow,Orange,Purple,Pink');
+CALL addSizesToProduct('BroomSweep Logo Shirt', 'XS,S,M,L,XL,XXL');
+CALL addSizesToProduct('Hero Shirt', 'XS,S,M,L,XL,XXL');
+CALL addSizesToProduct('Vilain Shirt', 'XS,S,M,L,XL,XXL');

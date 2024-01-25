@@ -7,6 +7,12 @@ if (!$user->isLoggedIn() || !$user->hasPermission('admin')) {
     Redirect::to('index.php');
 }
 
+$currentID = 0;
+$productIteration = 0;
+
+$categories = Database::getInstance()->get('categories', array('category_ID', '>', 0))->results();
+$discounts = Database::getInstance()->get('discounts', array('discount_ID', '>', 0))->results();
+
 // Retrieve distinct product names
 $products = Database::getInstance()->query("SELECT DISTINCT product_name FROM products ORDER BY category_ID, product_name")->results();
 $chosenProduct = null;
@@ -37,22 +43,29 @@ foreach ($orders as $order) {
 if (Input::exists()) {
     if (isset($_POST['productSubmit'])) {
         // PRODUCT SELECTION --------------------------------------------
-        $chosenProduct = Database::getInstance()->get('products', array('product_name', '=', Input::get('selectedProduct')))->first();
-        $category_name = Database::getInstance()->get('categories', array('category_ID', '=', $chosenProduct->category_ID))->first()->category_name;
+        //Create array of each product with same name and distinct color id
+        $chosenProduct = Database::getInstance()->query("SELECT * FROM products WHERE product_name = ? GROUP BY color_ID", array(Input::get('selectedProduct')))->results();
+        //all products, sorted by color id and then size id
+        $allOfChosenProduct = Database::getInstance()->query("SELECT * FROM products WHERE product_name = ? ORDER BY color_ID, size_ID", array(Input::get('selectedProduct')))->results();
 
-        $colors = Product::defineColors($chosenProduct->product_name);
-        $colorsHTML = '';
-        foreach ($colors as $color) {
-            $colorsHTML .= $color->color_name . "<br>";
+        $category_name = Database::getInstance()->get('categories', array('category_ID', '=', $chosenProduct[0]->category_ID))->first()->category_name;
+        $discount_name = Database::getInstance()->get('discounts', array('discount_ID', '=', $chosenProduct[0]->discount_ID))->first()->discount_name;
+        $discount_percentage = Database::getInstance()->get('discounts', array('discount_ID', '=', $chosenProduct[0]->discount_ID))->first()->discount_percentage;
+
+        //Get color name for each product. Only show the corresponding color name of each product, since they all have different colors
+        $colors = [];
+        foreach ($chosenProduct as $product) {
+            $color_name = Database::getInstance()->get('colors', array('color_ID', '=', $product->color_ID))->first()->color_name;
+            $colors[] = $color_name;
         }
+        
+        $sizes = Product::defineSizes($chosenProduct[0]->product_name);
 
-        $sizes = Product::defineSizes($chosenProduct->product_name);
-        $sizesHTML = '';
-        foreach ($sizes as $size) {
-            $sizesHTML .= $size->size_name . "<br>";
-        }
+        $quantities = [];
+        foreach ($chosenProduct as $product) {
+            $quantities[] = Database::getInstance()->query("SELECT quantity FROM products WHERE product_name = ? AND color_ID = ? ORDER BY size_ID", array($product->product_name, $product->color_ID))->results();
+        }        
 
-        $discount_name = Database::getInstance()->get('discounts', array('discount_ID', '=', $chosenProduct->discount_ID))->first()->discount_name;
     } elseif (isset($_POST['userSubmit'])) {
         // USER SELECTION -----------------------------------------------
         $selectedUser = Database::getInstance()->get('users', array('username', '=', Input::get('selectedUser')))->first();
@@ -82,5 +95,14 @@ if (Input::exists()) {
                 $itemsHTML .= "x" . $orderItem->quantity . " " . $orderedProduct->product_name . " || " . $orderedProduct->product_price . "dkk" . "<br>";
             }
         }
+    }
+
+    $productID = isset($_POST['productID']) ? $_POST['productID'] : null;
+    $newQuantity = isset($_POST['newQuantity']) ? $_POST['newQuantity'] : null;
+
+    // Check if $productID is not null before attempting to update the database
+    if ($productID !== null) {
+        // Update the product quantity in the database
+        $updated = Database::getInstance()->update('products', 'product_ID', $productID, array('quantity' => $newQuantity));
     }
 }

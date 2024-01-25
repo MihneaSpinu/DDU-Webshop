@@ -29,7 +29,9 @@
 <div class="mt-5" id="colorSelector" style="display: <?php echo $colorSelect; ?>;">
     <label for="colorSelect">Select Color:</label>
     <select name="selectedColor" id="colorSelect" onchange="findColor(options[selectedIndex].value)">
-        <?php echo $colorsHTML; ?>
+        <?php 
+        echo $colorsHTML;
+        ?>
     </select>
 </div>
 
@@ -41,10 +43,10 @@
     var select = document.getElementById('colorSelect');
     var displayedImage = document.getElementById('displayedImage');
 
-    displayedImage.innerHTML = '<img src="' + imagePaths[select.value] + '" alt="Product Image">';
+    displayedImage.innerHTML = '<img style="width:500px;" src="' + imagePaths[select.value] + '" alt="Product Image">';
 
     // Function to display the image for the selected color
     function findColor(color) {
-        displayedImage.innerHTML = '<img src="' + imagePaths[color] + '" alt="Product Image">';
+        displayedImage.innerHTML = '<img style="width:500px;" src="' + imagePaths[color] + '" alt="Product Image">';
     }
 </script>

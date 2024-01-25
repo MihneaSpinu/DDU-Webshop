@@ -61,27 +61,24 @@ class Product
         try {
             $imagePaths = [];
             $colors = self::defineColors($productName);
-            $imageCount = 0;
 
             if (in_array('no color', $colors)) {
+                $imageCount = 0;
                 foreach (glob(FRONTEND_ASSET . 'productImages/' . $productName) as $filename) {
                     $imageCount++;
                     $imagePaths['no color'] = FRONTEND_ASSET . 'productImages/' . $productName . ' (' . $imageCount . ')' . '.png';
                 }
             } else {
                 foreach ($colors as $color) {
-                    foreach (glob(FRONTEND_ASSET . 'productImages/' . $productName . '-' . $color->color_name . '.png') as $filename) {
+                    //All images are named like this: productname-colorname (number).png
+                    $imageCount = 0;
+                    foreach (glob(FRONTEND_ASSET . 'productImages/' . $productName . '-' . $color->color_name . '*') as $filename) {
                         $imageCount++;
                         $imagePaths[$color->color_name] = FRONTEND_ASSET . 'productImages/' . $productName . '-' . $color->color_name . ' (' . $imageCount . ')' . '.png';
                     }
                 }
             }
-            var_dump($imageCount);
-            var_dump($imagePaths);
-
             
-            //dump amount of images with glob product name
-
             //Check if the image exists
             foreach ($imagePaths as $color->color_name => $imagePath) {
                 if (!file_exists($imagePath)) {
