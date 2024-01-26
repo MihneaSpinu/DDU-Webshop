@@ -13,10 +13,8 @@
 
 <!-- Print the product information -->
 <?php
-if (isset($chosenProduct)) :
-    $i = 0;
-    $allProducts = 0; ?>
-    <h3><?php echo $chosenProduct[0]->product_name . " (" . count($chosenProduct) . ")"; ?></h3>
+if (isset($chosenProduct)) : ?>
+    <h3><?php echo $chosenProduct->product_name . " (" . count($allProductsCount) . ")"; ?></h3>
     <!-- Edit product here. Create a table with Name, description, price, weight, category select, add/remove color button, add/remove size button, discount select. If something changes, update database for all products with the same name -->
     <form action="warehouse.php" method="post">
         <table class="table table-striped table-bordered">
@@ -32,33 +30,32 @@ if (isset($chosenProduct)) :
             </thead>
             <tbody>
                 <tr>
-                    <td><input type="text" name="productName" value="<?php echo $chosenProduct[0]->product_name; ?>"></td>
-                    <td><input type="text" name="productDescription" value="<?php echo $chosenProduct[0]->product_description; ?>"></td>
-                    <td><input type="text" name="productPrice" value="<?php echo $chosenProduct[0]->product_price; ?>"></td>
-                    <td><input type="text" name="productWeight" value="<?php echo $chosenProduct[0]->product_weight; ?>"></td>
+                    <td><input type="text" name="productName" value="<?php echo $chosenProduct->product_name; ?>"></td>
+                    <td><input type="text" name="productDescription" value="<?php echo $chosenProduct->product_description; ?>"></td>
+                    <td><input type="text" name="productPrice" value="<?php echo $chosenProduct->product_price; ?>"></td>
+                    <td><input type="text" name="productWeight" value="<?php echo $chosenProduct->product_weight; ?>"></td>
                     <td>
                         <select name="categorySelect">
                             <?php foreach ($categories as $category) : ?>
-                                <option value="<?php echo $category->category_ID; ?>" <?php echo ($category->category_ID == $chosenProduct[0]->category_ID) ? "selected" : ""; ?>><?php echo $category->category_name; ?></option>
+                                <option value="<?php echo $category->category_ID; ?>" <?php echo ($category->category_ID == $chosenProduct->category_ID) ? "selected" : ""; ?>><?php echo $category->category_name; ?></option>
                             <?php endforeach; ?>
                         </select>
                     </td>
                     <td>
                         <select name="discountSelect">
                             <?php foreach ($discounts as $discount) : ?>
-                                <option value="<?php echo $discount->discount_ID; ?>" <?php echo ($discount->discount_ID == $chosenProduct[0]->discount_ID) ? "selected" : ""; ?>><?php echo $discount->discount_name; ?></option>
+                                <option value="<?php echo $discount->discount_ID; ?>" <?php echo ($discount->discount_ID == $chosenProduct->discount_ID) ? "selected" : ""; ?>><?php echo $discount->discount_name; ?></option>
                             <?php endforeach; ?>
                         </select>
                     </td>
                 </tr>
             </tbody>
         </table>
-        <input type="hidden" name="productID" value="<?php echo $chosenProduct[0]->product_ID; ?>">
+        <input type="hidden" name="productID" value="<?php echo $chosenProduct->product_ID; ?>">
         <input type="submit" name="editProduct" value="Edit Product">
     </form>
-
-    <?php
-    foreach ($chosenProduct as $product) : ?>
+    <!-- get count of the first arrays in allproducts -->
+    <?php for ($i = 0; $i < count($allProducts); $i++) : $currentColor = $distinctColors[$i]->color_name ?>
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
@@ -76,45 +73,40 @@ if (isset($chosenProduct)) :
             <tbody>
                 <tr>
                     <td>
-                        <!-- Delete product button -->
-                        <form action="warehouse.php" method="post">
-                            <input type="hidden" name="productID" value="<?php echo $product->product_ID; ?>">
-                            <input type="submit" name="deleteProduct" value="Delete Product(s)">
-                        </form>
-                        <?php $productIteration++;
-                        for ($k = 0 + $currentID; $k < count($quantities[$i]) * $productIteration; $k++) : ?>
-                            <?php
-                            echo $allOfChosenProduct[$currentID]->product_ID . "<br>";
-                            $currentID++;
-                            ?>
-                        <?php endfor; ?>
+                        <!-- Delete product button. UpdateProuct(productID, quantity, true) -->
+                        <button class="btn btn-danger" onclick="updateProduct(<?php echo $product->product_ID; ?>, 0, true)">Delete</button>
+
+                        <!-- Print all ids of products with same color id as product->color_ID and unique size id -->
+                        <?php
+                        for ($j = 0; $j < count($allProducts[$currentColor]); $j++) {
+                            echo $allProducts[$currentColor][$distinctSizes[$j]->size_name][0]->product_ID . "<br>";
+                        }
+                        ?>
                     </td>
-                    <td><?php echo $product->product_name; ?></td>
-                    <td><?php echo $product->product_description; ?></td>
+                    <td><?php echo $chosenProduct->product_name; ?></td>
+                    <td><?php echo $chosenProduct->product_description; ?></td>
                     <td><?php
-                        echo $product->product_price . " kr <br>";
-                        echo "Original price: " . $product->product_price / (1 - ($discount_percentage / 100)) . " kr";
+                        echo $chosenProduct->product_price . " kr";
+                        echo "<br>Original price: " . $chosenProduct->product_price / (1 - ($discount_percentage / 100)) . " kr";
                         ?></td>
-                    <td><?php echo $product->product_weight . " g"; ?></td>
+                    <td><?php echo $chosenProduct->product_weight . " g"; ?></td>
                     <td><?php echo $category_name; ?></td>
-                    <td><?php echo $colors[$i]; ?></td>
-                    <td><?php $j = 0;
-                        foreach ($quantities[$i] as $quantity) : ?>
+                    <td><?php echo $currentColor->color_name; ?></td>
+                    <td><?php
+                        for ($j = 0; $j < count($allProducts[$currentColor]); $j++) : $currentSize = $distinctSizes[$j]->size_name ?>
                             <div class='input-group'>
                                 <div class='input-group-prepend'>
-                                    <button class='btn btn-outline-secondary' type='button' onclick='decrementQuantity(<?php echo $allOfChosenProduct[$allProducts]->product_ID; ?>)'>-</button>
+                                    <button class='btn btn-outline-secondary' type='button' onclick='decrementQuantity(<?php echo $allProducts[$currentColors][$currentSize][0]->product_ID; ?>)'>-</button>
                                 </div>
-                                <input type='text' class='form-control text-center' id='quantity_<?php echo $allOfChosenProduct[$allProducts]->product_ID; ?>' value='<?php echo $quantity->quantity; ?>'>
+                                <input type='text' class='form-control text-center' id='quantity_<?php echo $allProducts[$currentColor][$currentSize][0]->quantity ?>' value='<?php echo $allProducts[$currentColor][$currentSize][0]->quantity ?>'>
                                 <input class='btn btn-outline-secondary' type='submit' value='+' onclick='incrementQuantity(<?php echo $allOfChosenProduct[$allProducts]->product_ID; ?>)'>
                                 <div class='input-group-append' style='min-width: 50px;'>
                                     <span class='input-group-text'>
-                                        <?php echo $sizes[$j]->size_name;
-                                        $j++;
-                                        $allProducts++; ?>
+                                        <?php echo $currentSize->size_name; ?>
                                     </span>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
+                        <?php endfor; ?>
                     </td>
                     <td><?php
                         echo $discount_name;
@@ -123,9 +115,7 @@ if (isset($chosenProduct)) :
                 </tr>
             </tbody>
         </table>
-        <?php $i++;
-        $allProducts++; ?>
-    <?php endforeach; ?>
+    <?php endfor; ?>
 
 <?php else : ?>
     <p>Please select a product.</p>
@@ -137,7 +127,7 @@ if (isset($chosenProduct)) :
         var currentQuantity = parseInt(quantityField.val());
         if (currentQuantity <= 99) {
             quantityField.val(currentQuantity + 1);
-            updateProductQuantity(ProductID, currentQuantity + 1);
+            updateProduct(ProductID, currentQuantity + 1);
         }
     }
 
@@ -146,7 +136,7 @@ if (isset($chosenProduct)) :
         var currentQuantity = parseInt(quantityField.val());
         if (currentQuantity > 1) {
             quantityField.val(currentQuantity - 1);
-            updateProductQuantity(ProductID, currentQuantity - 1);
+            updateProduct(ProductID, currentQuantity - 1);
         }
     }
 
@@ -160,16 +150,18 @@ if (isset($chosenProduct)) :
         }
         var ProductID = $(this).attr('id').replace('quantity_', '');
         var newQuantity = $(this).val();
-        updateProductQuantity(ProductID, newQuantity);
+        updateProduct(ProductID, newQuantity);
     });
 
-    function updateProductQuantity(productID, newQuantity) {
+    function updateProduct(productID, newQuantity, deleteProduct = false) {
+        console.log(productID);
         $.ajax({
             url: "warehouse.php",
             type: "POST",
             data: {
                 productID: productID,
-                newQuantity: newQuantity
+                newQuantity: newQuantity,
+                deleteProduct: deleteProduct
             },
         });
     }

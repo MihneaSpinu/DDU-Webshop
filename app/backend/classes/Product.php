@@ -40,12 +40,12 @@ class Product
         return $colors;
     }
 
-    public static function defineSizes($productName)
+    public static function defineSizes($productName, $colorID)
     {
         $sizes = [];
 
-        // Get all the sizes for the product as objects, but only get unique ones
-        $query = Database::getInstance()->query("SELECT DISTINCT size_ID FROM products WHERE product_name = ?", array($productName));
+        // Get all the sizes for the product as objects
+        $query = Database::getInstance()->query("SELECT DISTINCT size_ID FROM products WHERE product_name = ? AND color_ID = ?", array($productName, $colorID));
         $sizeIDs = $query->results();
 
         foreach ($sizeIDs as $sizeID) {

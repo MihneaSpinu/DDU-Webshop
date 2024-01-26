@@ -25,7 +25,7 @@ foreach ($colorNames as $color) {
 }
 
 $sizeNames = [];
-foreach (Product::defineSizes($name) as $size) {
+foreach (Product::defineSizes($name, $product->color_ID) as $size) {
     $sizeNames[] = $size->size_name;
 }
 $sizesHTML = "";
