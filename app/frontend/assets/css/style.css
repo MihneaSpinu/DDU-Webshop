@@ -1,6 +1,6 @@
 
 body {
-    background-color: rgb(43, 42, 51);
+    background-color: white;
 }
 
 .header {
@@ -29,4 +29,9 @@ footer {
 }
 .bg-dark a, a, h1, h2, h3, label {
     color: rgba(255,255,255,.7);
+}
+
+.card {
+    border-radius: 0;
+    box-shadow: 3px 3px 10px black;
 }

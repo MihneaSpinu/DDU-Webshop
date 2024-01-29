@@ -30,7 +30,7 @@ foreach ($cartItems as $cartItem) {
                                     <button class='btn btn-outline-secondary' type='button' onclick='decrementQuantity(" . $cartItem->cart_item_ID . ")'>-</button>
                                 </div>
                                 <input type='text' class='form-control text-center' id='quantity_" . $cartItem->cart_item_ID . "' value='" . $cartItem->quantity . "'>
-                                    <input class='btn btn-outline-secondary' type='submit' value='+' onclick='incrementQuantity(" . $cartItem->cart_item_ID . ")'>
+                                    <input class='btn btn-outline-secondary' type='button' value='+' onclick='incrementQuantity(" . $cartItem->cart_item_ID . ")'>
                             </div>
                         </td>
                         <td>"

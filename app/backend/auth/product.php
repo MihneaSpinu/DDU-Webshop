@@ -14,6 +14,7 @@ if (Input::get('name')) {
     Redirect::to('index.php');
 }
 $name = $product->product_name;
+$discount = Database::getInstance()->get('discounts', array('discount_ID', '=', $product->discount_ID))->first();
 
 $colorNames = [];
 foreach (Product::defineColors($name) as $color) {
@@ -33,8 +34,6 @@ foreach ($sizeNames as $size) {
     $sizesHTML .= "<option value='" . $size . "'>" . $size . "</option>";
 }
 
-$imagePaths = Product::defineImagePaths($name);
-
 if (count($colorNames) > 1) {
     $colorSelect = "block";
 } else {
@@ -44,4 +43,13 @@ if (count($sizeNames) > 1) {
     $sizeSelect = "block";
 } else {
     $sizeSelect = "none";
+}
+
+
+$imagePaths = Product::defineImagePaths($name);
+$imagesHTML = "";
+foreach ($imagePaths as $imagePath) {
+    foreach ($imagePath as $image) {
+        $imagesHTML .= "<div><img style='width:100%;' class='product-image' src='" . $image . "' alt=''></div>";
+    }
 }

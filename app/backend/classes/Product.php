@@ -74,16 +74,8 @@ class Product
                     $imageCount = 0;
                     foreach (glob(FRONTEND_ASSET . 'productImages/' . $productName . '-' . $color->color_name . '*') as $filename) {
                         $imageCount++;
-                        $imagePaths[$color->color_name] = FRONTEND_ASSET . 'productImages/' . $productName . '-' . $color->color_name . ' (' . $imageCount . ')' . '.png';
+                        $imagePaths[$color->color_name][] = FRONTEND_ASSET . 'productImages/' . $productName . '-' . $color->color_name . ' (' . $imageCount . ')' . '.png';
                     }
-                }
-            }
-            
-            //Check if the image exists
-            foreach ($imagePaths as $color->color_name => $imagePath) {
-                if (!file_exists($imagePath)) {
-                    //If it doesn't, display a placeholder image
-                    $imagePaths[$color->color_name] = FRONTEND_ASSET . 'productImages/' . 'placeholder.png';
                 }
             }
 
