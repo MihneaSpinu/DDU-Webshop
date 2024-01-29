@@ -12,10 +12,16 @@ $uid = $sessionUser->uid;
 $cart = Database::getInstance()->get('carts', array('uid', '=', $uid))->first();
 // Find all cart items for this cart.
 $cartItems = Database::getInstance()->get('cart_items', array('cart_ID', '=', $cart->cart_ID))->results();
+foreach ($cartItems as $cartItem) {
+    $product = Database::getInstance()->get('products', array('product_ID', '=', $cartItem->product_ID))->first();
+    $productItems[] = $product;
+}
+
 $productsHTML = "";
 foreach ($cartItems as $cartItem) {
     $product = Database::getInstance()->get('products', array('product_ID', '=', $cartItem->product_ID))->first();
-    //Find product discount percent from discount table (find discount_percentage)
+    $color = Database::getInstance()->get('colors', array('color_ID', '=', $product->color_ID))->first();
+    $size = Database::getInstance()->get('sizes', array('size_ID', '=', $product->size_ID))->first();
     $discount = Database::getInstance()->get('discounts', array('discount_ID', '=', $product->discount_ID))->first();
 
     //calculate original price
@@ -23,7 +29,16 @@ foreach ($cartItems as $cartItem) {
 
     // quantity can be incremented by 1 or decremented by 1 from buttons
     $productsHTML .= "<tr>
-                        <td>" . $product->product_name . "</td>
+                        <td>" . $product->product_name . "<br>"
+                            . (($color->color_ID !== 1 && $size->size_ID !== 1) ?
+                                $color->color_name . " / " . $size->size_name : "") . "
+                                " . //Button to remove product from cart
+                            "<form action='' method='post'>
+                            <input type='hidden' name='csrf_token' value='" . Token::generate() . "'>
+                            <input type='hidden' name='cartItemID' value='" . $cartItem->cart_item_ID . "'>
+                            <input type='submit' name='removeFromCart' value='Remove' class='btn btn-danger btn-sm'>
+                            </form>
+                        </td>
                         <td>
                             <div class='input-group'>
                                 <div class='input-group-prepend'>
@@ -34,18 +49,18 @@ foreach ($cartItems as $cartItem) {
                             </div>
                         </td>
                         <td>"
-                            . (($discount->discount_ID !== 1 && $discount->active) ?
-                            "<span class='text-danger'>
+        . (($discount->discount_ID !== 1 && $discount->active) ?
+            "<span class='text-danger'>
                                 <del>" . $product->product_org_price . " dkk </del>
                             </span><br>"
-                            . $product->product_price . " dkk <br>" . "
+            . $product->product_price . " dkk <br>" . "
                             <span class='text-success'>Discount: " . $discount->discount_percentage . "%</span>" : $product->product_price . " dkk <br>" . "") .
-                        "</td>
+        "</td>
 
 
-                        <td id='subtotal_" . $cartItem->cart_item_ID . "'>" 
-                            . $cartItem->quantity * $product->product_price . " dkk" .
-                        "</td>
+                        <td id='subtotal_" . $cartItem->cart_item_ID . "'>"
+        . $cartItem->quantity * $product->product_price . " dkk" .
+        "</td>
                     </tr>";
 }
 

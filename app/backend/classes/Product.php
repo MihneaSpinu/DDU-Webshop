@@ -17,7 +17,7 @@ class Product
         }
     }
 
-    public function addToCart($fields = array())
+    public static function addToCart($fields = array())
     {
         if (!Database::getInstance()->insert('cart_items', $fields)) {
             throw new Exception('There was a problem adding the product to the cart.');
@@ -62,11 +62,11 @@ class Product
             $imagePaths = [];
             $colors = self::defineColors($productName);
 
-            if (in_array('no color', $colors)) {
+            if (in_array('No Color', $colors)) {
                 $imageCount = 0;
                 foreach (glob(FRONTEND_ASSET . 'productImages/' . $productName) as $filename) {
                     $imageCount++;
-                    $imagePaths['no color'] = FRONTEND_ASSET . 'productImages/' . $productName . ' (' . $imageCount . ')' . '.png';
+                    $imagePaths['No Color'][] = FRONTEND_ASSET . 'productImages/' . $productName . ' (' . $imageCount . ')' . '.png';
                 }
             } else {
                 foreach ($colors as $color) {

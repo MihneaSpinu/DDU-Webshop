@@ -13,8 +13,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php echo $productsHTML;
-                    ?>
+                    <?php echo $productsHTML; ?>
                 </tbody>
                 <tfoot>
                     <tr>

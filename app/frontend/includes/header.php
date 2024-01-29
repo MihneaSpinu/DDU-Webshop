@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo FRONTEND_ASSET . 'css/style.css'; ?>">
-    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.3.11/slick.css" />
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/jquery.slick/1.3.11/slick.css" />
+    <link rel="shortcut icon" href="#" />
 </head>
 
 <body>

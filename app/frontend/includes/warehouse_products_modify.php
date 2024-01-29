@@ -56,14 +56,3 @@
         <input type="submit" name="createProduct" value="Create Product">
     </form>
 </div>
-
-<!-- Select a product -->
-<form class="form-group" method="POST">
-    <label for="productSelect">Select Product:</label>
-    <select name="selectedProduct" id="selectedProduct">
-        <?php foreach ($products as $product) : ?>
-            <option value="<?php echo $product->product_name; ?>"><?php echo $product->product_name; ?></option>
-        <?php endforeach; ?>
-    </select>
-    <input type="submit" name="productSubmit" value="Select">
-</form>

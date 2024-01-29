@@ -8,127 +8,26 @@ if (!$user->isLoggedIn() || !$user->hasPermission('admin')) {
 }
 
 $db = Database::getInstance();
+$selectedProduct = Input::get('selectedProduct');
 
-// Function to handle form submissions
-function handleFormSubmission($actionType)
-{
-    global $db;
-    if (Input::exists() && isset($_POST[$actionType])) {
-        if (Token::check(Input::get('csrf_token'))) {
-            $validate = new Validation();
+Warehouse::handleFormSubmission('createProduct');
+Warehouse::handleFormSubmission('editProduct');
 
-            $validationRules = [
-                'productName' => ['required' => true, 'min' => 2, 'max' => 255],
-                'productDescription' => ['required' => true, 'min' => 2, 'max' => 500],
-                'productPrice' => ['required' => true, 'numeric' => true],
-                'productWeight' => ['required' => true, 'numeric' => true],
-                'categorySelect' => ['required' => true],
-                'discountSelect' => ['required' => true],
-                'colorSelect' => ['required' => true, 'isArray' => true],
-                'sizeSelect' => ['required' => true, 'isArray' => true],
-            ];
-
-            $validation = $validate->check($_POST, $validationRules);
-
-            if ($validation->passed()) {
-                try {
-                    $productName = Input::get('productName');
-                    $productDescription = Input::get('productDescription');
-                    $productPrice = Input::get('productPrice');
-                    $productWeight = Input::get('productWeight');
-                    $categorySelect = Input::get('categorySelect');
-                    $discountSelect = Input::get('discountSelect');
-                    $colorSelect = Input::get('colorSelect');
-                    $sizeSelect = Input::get('sizeSelect');
-
-                    // Insert or update products based on action type
-                    if ($actionType === 'createProduct') {
-                        insertProducts($db, $productName, $productDescription, $productPrice, $productWeight, $categorySelect, $discountSelect, $colorSelect, $sizeSelect);
-                    } elseif ($actionType === 'editProduct') {
-                        $formerProductName = Input::get('currentProductName');
-                        updateProducts($db, $productName, $productDescription, $productPrice, $productWeight, $categorySelect, $discountSelect, $formerProductName, $colorSelect, $sizeSelect);
-                    }
-                } catch (Exception $e) {
-                    die($e->getMessage());
-                }
-            } else {
-                echo '<div class="alert alert-danger"><strong></strong>' . cleaner($validation->error()) . '</div>';
-            }
-        }
-    }
-}
-
-handleFormSubmission('createProduct');
-handleFormSubmission('editProduct');
-
-// Function to insert products into the database
-function insertProducts($db, $productName, $productDescription, $productPrice, $productWeight, $categorySelect, $discountSelect, $colorSelect, $sizeSelect, $checkIfProductExists = false)
-{
-    // For each color and size, insert a new product
-    foreach ($colorSelect as $color) {
-        foreach ($sizeSelect as $size) {
-            // Check if the product already exists
-            if ($checkIfProductExists) {
-                $productExists = $db->query("SELECT * FROM products WHERE product_name = ? AND color_ID = ? AND size_ID = ?", [$productName, $color, $size])->count();
-                if ($productExists) {
-                    break;
-                }
-            }
-            $sql = "INSERT INTO products (product_name, product_description, product_price, product_weight, category_ID, color_ID, size_ID, discount_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            $params = [
-                $productName,
-                $productDescription,
-                $productPrice,
-                $productWeight,
-                $categorySelect,
-                $color,
-                $size,
-                $discountSelect
-            ];
-            $db->query($sql, $params);
-        }
-    }
-}
-
-// Function to update products in the database
-function updateProducts($db, $productName, $productDescription, $productPrice, $productWeight, $categorySelect, $discountSelect, $formerProductName, $colorSelect, $sizeSelect)
-{
-    $sql = "UPDATE products SET 
-                product_name = ?,
-                product_description = ?, 
-                product_price = ?, 
-                product_weight = ?, 
-                category_ID = ?,
-                discount_ID = ? 
-                WHERE product_name = ?";
-
-    $params = [
-        $productName,
-        $productDescription,
-        $productPrice,
-        $productWeight,
-        $categorySelect,
-        $discountSelect,
-        $formerProductName
-    ];
-
-    $db->query($sql, $params);
-
-    insertProducts($db, $productName, $productDescription, $productPrice, $productWeight, $categorySelect, $discountSelect, $colorSelect, $sizeSelect, true);
-}
-
+// Retrieve all products, categories, discounts, colors and sizes
+$products = $db->query("SELECT DISTINCT product_name FROM products ORDER BY product_name")->results();
 $categories = $db->get('categories', array('category_ID', '>', 0))->results();
 $discounts = $db->get('discounts', array('discount_ID', '>', 0))->results();
 $colors = $db->get('colors', array('color_ID', '>', 0))->results();
 $sizes = $db->get('sizes', array('size_ID', '>', 0))->results();
-$products = $db->query("SELECT DISTINCT product_name FROM products ORDER BY product_name")->results();
+
+// Retrieve all users
 $users = $db->get('users', array('uid', '>', 0))->results();
 
 // Retrieve all orders if any
 $ordersCount = $db->query("SELECT COUNT(*) FROM orders")->first()->{'COUNT(*)'};
 $orders = $ordersCount > 0 ? $db->query("SELECT * FROM orders ORDER BY order_date DESC")->results() : array();
 
-// Retrieve All months with orders
+// Retrieve all months with orders
 $monthsWithOrders = array();
 foreach ($orders as $order) {
     $yearMonth = date('Y-m', strtotime($order->order_date));
@@ -200,19 +99,17 @@ if (Input::exists()) {
     // Handle update quantity and delete color form product
     $productID = isset($_POST['productID']) ? $_POST['productID'] : null;
     $newQuantity = isset($_POST['newQuantity']) ? $_POST['newQuantity'] : null;
-    $colorToDelete = isset($_POST['colorToDelete']) ? $_POST['colorToDelete'] : null;
+    $colorToDelete = isset($_POST['deleteColor']) ? $_POST['deleteColor'] : null;
+    $productName = isset($_POST['productName']) ? $_POST['productName'] : null;
+
     // Check if $productID is not null before attempting to update the database
     if ($productID) {
         // Update the product quantity in the database
-        $updated = $db->update('products', 'product_ID', $productID, array('quantity' => $newQuantity));
+        $db->update('products', 'product_ID', $productID, array('quantity' => $newQuantity));
     }
-
     // Check if $deleteProduct is not null before attempting to delete the product
-    if ($colorToDelete) {
-        // Delete every product with color id $colorToDelete
-        //Get color id from name
-        $colorID = $db->get('colors', array('color_name', '=', $colorToDelete))->first()->color_ID;
-        //Delete all products with same name and color id
-        $db->query("DELETE FROM products WHERE product_name = ? AND color_ID = ?", array(Input::get('selectedProduct'), $colorID));
+    if ($colorToDelete && $productName) {
+        $colorID = $db->query("SELECT color_ID FROM colors WHERE color_name = ?", array($colorToDelete))->first()->color_ID;
+        $db->query("DELETE FROM products WHERE product_name = ? AND color_ID = ?", array($productName, $colorID));       
     }
 }

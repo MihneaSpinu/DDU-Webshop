@@ -3,6 +3,17 @@
 
 <?php require_once 'warehouse_products_modify.php'; ?>
 
+<!-- Select a product -->
+<form class="form-group" method="POST">
+    <label for="productSelect">Select Product:</label>
+    <select name="selectedProduct" id="selectedProduct">
+        <?php foreach ($products as $product) : ?>
+            <option value="<?php echo $product->product_name; ?>"><?php echo $product->product_name; ?></option>
+        <?php endforeach; ?>
+    </select>
+    <input type="submit" name="productSubmit" value="Select">
+</form>
+
 <!-- Print the product information -->
 <?php
 if (isset($chosenProduct)) : ?>
@@ -96,7 +107,7 @@ if (isset($chosenProduct)) : ?>
                 <tr>
                     <td>
                         <!-- Delete product button. UpdateProuct(productID, quantity, true) -->
-                        <input type="submit" class="btn btn-danger" value="Delete" onclick='deleteColor("<?php echo $currentColor; ?>")'>
+                        <input type="submit" class="btn btn-danger" value="Delete" onclick='deleteColor("<?php echo $currentColor ?> ", "<?php echo $chosenProduct->product_name ?>")'>
 
                         <!-- Print all ids of products with same color id as product->color_ID and unique size id -->
                         <?php
@@ -123,16 +134,16 @@ if (isset($chosenProduct)) : ?>
                                 $productID = $allProducts[$currentColor][$currentSize][0]->product_ID;
                                 $quantity = $allProducts[$currentColor][$currentSize][0]->quantity;
                         ?>
-                        <div class='input-group'>
-                            <input class='btn btn-outline-secondary' type='submit' value='-' onclick='decrementQuantity(<?php echo $productID; ?>)'>
-                            <input type='text' class='form-control text-center' id='quantity_<?php echo $productID; ?>' value='<?php echo $quantity; ?>'>
-                            <input class='btn btn-outline-secondary' type='submit' value='+' onclick='incrementQuantity(<?php echo $productID; ?>)'>
-                            <div class='input-group-append' style='min-width: 50px;'>
-                                <span class='input-group-text'>
-                                    <?php echo $currentSize; ?>
-                                </span>
-                            </div>
-                        </div>
+                                <div class='input-group'>
+                                    <input class='btn btn-outline-secondary' type='submit' value='-' onclick='decrementQuantity(<?php echo $productID; ?>)'>
+                                    <input type='text' class='form-control text-center' id='quantity_<?php echo $productID; ?>' value='<?php echo $quantity; ?>'>
+                                    <input class='btn btn-outline-secondary' type='submit' value='+' onclick='incrementQuantity(<?php echo $productID; ?>)'>
+                                    <div class='input-group-append' style='min-width: 50px;'>
+                                        <span class='input-group-text'>
+                                            <?php echo $currentSize; ?>
+                                        </span>
+                                    </div>
+                                </div>
                         <?php }
                         endfor; ?>
                     </td>
@@ -187,19 +198,18 @@ if (isset($chosenProduct)) : ?>
             type: "POST",
             data: {
                 productID: productID,
-                newQuantity: newQuantity,
-                test: "test"
+                newQuantity: newQuantity
             },
         });
     }
 
-    function deleteColor(color) {
-        console.log(color);
+    function deleteColor(color, productName) {
         $.ajax({
             url: "warehouse.php",
             type: "POST",
             data: {
-                colorToDelete: color
+                deleteColor: color,
+                productName: productName
             },
         });
     }
