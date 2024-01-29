@@ -1,5 +1,5 @@
 <!-- Select a user -->
-<h2 class="text-center mt-5 border-top border-dark">User Information</h2>
+<h2 class="text-center mt-5 border-top border-dark font-weight-bold">User Information</h2>
 <form class="form-group" method="POST">
     <label for="userSelect">Select User:</label>
     <select name="selectedUser" id="userSelect">

@@ -1,5 +1,5 @@
 <!-- Select a month -->
-<h2 class="text-center mt-5 border-top border-dark">Order Information</h2>
+<h2 class="text-center mt-5 border-top border-dark font-weight-bold">Order Information</h2>
 <form class="form-group" method="POST">
     <label for="monthSelect">Select Orders By Month:</label>
     <select name="selectedMonth" id="monthSelect">
