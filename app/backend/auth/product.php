@@ -5,19 +5,27 @@ if (Input::get('name')) {
     $products = Database::getInstance()->query("SELECT * FROM products WHERE product_name = ?", array(Input::get('name')))->results();
     if (count($products) <= 0) {
         Session::flash('danger', 'Product not found.');
-        Redirect::to('index.php');
+        Redirect::to('/');
     }
     $product = $products[0];
 } else {
     Session::flash('danger', 'Product not found.');
-    Redirect::to('index.php');
+    Redirect::to('/');
+}
+
+$loggedIn = false;
+if ($user->isLoggedIn()) {
+    $loggedIn = true;
 }
 $db = Database::getInstance();
 
 $name = Input::get('name');
 $discount = $db::getInstance()->get('discounts', array('discount_ID', '=', $product->discount_ID))->first();
 $product->product_org_price = $product->product_price / (1 - ($discount->discount_percentage / 100));
-$cart = $db::getInstance()->get('carts', array('uid', '=', $user->data()->uid))->first();
+if ($loggedIn)
+{
+    $cart = $db::getInstance()->get('carts', array('uid', '=', $user->data()->uid))->first();
+}
 
 $colors = [];
 $colorsHTML = "";
@@ -53,7 +61,7 @@ if (count($sizes) > 1) {
     $sizeSelect = "none";
 }
 
-if (Input::exists() && isset($_POST['addToCart'])) {
+if (Input::exists() && Input::get('addToCart')) {
     if (Token::check(Input::get('csrf_token'))) {
         $validate = new Validation();
         $validation = $validate->check($_POST, array(

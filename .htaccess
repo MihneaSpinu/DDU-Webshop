@@ -1,2 +1,9 @@
 AddType application/x-httpd-php81 .php
 php_flag output_buffering on
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On    
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^([^\.]+)$ $1.php [NC,L]
+</IfModule>

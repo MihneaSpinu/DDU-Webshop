@@ -9,54 +9,62 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="product-info">
-                <h1 class="product-name">
-                    <?php echo $product->product_name; ?>
-                </h1>
-                <div class="product-price text-white">
-                    <?php
-                    if ($discount->discount_percentage > 0 && $discount->active) : ?>
-                        <h4> <?php echo $discount->discount_name; ?> Sale </h4>
-                        <p> <span class='text-success'><?php echo $discount->discount_percentage; ?>% Discount!</span>
-                        <p>
-                            <a> Original price: </a>
-                            <span class='text-danger'>
-                                <del><?php echo $product->product_org_price; ?> dkk </del>
-                            </span><br>
+            <h1 class="product-name">
+                <?php echo $product->product_name; ?>
+            </h1>
+            <div class="product-price text-white">
+                <?php if ($discount->discount_percentage > 0 && $discount->active) : ?>
+                    <h4><?php echo $discount->discount_name; ?> Sale</h4>
+                    <p><span class='text-success'><?php echo $discount->discount_percentage; ?>% Discount!</span></p>
+                    <p>
+                        <a>Original price:</a>
+                        <span class='text-danger'>
+                            <del><?php echo $product->product_org_price; ?> dkk </del>
+                        </span><br>
                         <h3><?php echo $product->product_price; ?> dkk </h3>
-
-                    <?php else : ?>
-                        <?php echo $product->product_price; ?> dkk <br>
-                    <?php endif; ?>
-                </div>
-                <div class="border-top border-bottom my-2">
-                    <form class="card my-2 py-2" action="" method="post">
-                        <div class="row">
-                            <!-- Only show if product has colors -->
-                            <div class="col d-<?php echo $colorSelect ?>">
-                                <label class="text-dark">Color</label><br>
-                                <select class="w-100" name="colorSelect" id="colorSelect">
-                                    <?php echo $colorsHTML; ?>
-                                </select>
-                            </div>
-                            <!-- Only show if product has sizes -->
-                            <div class="col d-<?php echo $sizeSelect ?>">
-                                <label class="text-dark">Size</label><br>
-                                <select class="w-100" name="sizeSelect" id="sizeSelect">
-                                    <?php echo $sizesHTML; ?>
-                                </select>
-                            </div>
-                            <div class="col-3">
-                                <label class="text-dark"">Quantity</label><br>
-                                <div class=" input-group">
-                                    <div class="input-group-prepend"><input class='btn btn-outline-secondary' type='button' value='-' onclick='decrementQuantity()'></div>
-                                    <input type="text" class="form-control text-center" name="quantitySelect" id="quantity" value="1" min="1" max="99">
-                                    <div class="input-group-append"><input class='btn btn-outline-secondary' type='button' value='+' onclick='incrementQuantity()'></div>
+                    </p>
+                <?php else : ?>
+                    <?php echo $product->product_price; ?> dkk <br>
+                <?php endif; ?>
+            </div>
+            <div class="border-top border-bottom my-2">
+                <form class="card my-2 py-2" action="" method="post">
+                    <div class="row">
+                        <!-- Only show if product has colors -->
+                        <div class="col d-<?php echo $colorSelect ?>">
+                            <label class="text-dark">Color</label><br>
+                            <select class="w-100" name="colorSelect" id="colorSelect">
+                                <?php echo $colorsHTML; ?>
+                            </select>
+                        </div>
+                        <!-- Only show if product has sizes -->
+                        <div class="col d-<?php echo $sizeSelect ?>">
+                            <label class="text-dark">Size</label><br>
+                            <select class="w-100" name="sizeSelect" id="sizeSelect">
+                                <?php echo $sizesHTML; ?>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <label class="text-dark">Quantity</label><br>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <input class='btn btn-outline-secondary' type='button' value='-' onclick='decrementQuantity()'>
+                                </div>
+                                <input type="text" class="form-control text-center" name="quantitySelect" id="quantity" value="1" min="1" max="99">
+                                <div class="input-group-append">
+                                    <input class='btn btn-outline-secondary' type='button' value='+' onclick='incrementQuantity()'>
+                                </div>
                             </div>
                         </div>
-                </div>
-                <input type="hidden" name="csrf_token" value="<?php echo Token::generate(); ?>">
-                <input type="submit" name="addToCart" value="Add to cart" class="btn btn-primary mt-2">
+                    </div>
+                    <div class="cart">
+                        <?php if ($loggedIn) : ?>
+                            <input type="hidden" name="csrf_token" value="<?php echo Token::generate(); ?>">
+                            <input type="submit" name="addToCart" value="Add to cart" class="btn btn-primary mt-2">
+                        <?php else : ?>
+                            <a href="/login" class="btn btn-primary mt-2">Login to add to cart</a>
+                        <?php endif; ?>
+                    </div>
                 </form>
             </div>
             <div class="product-description text-white">
@@ -65,7 +73,7 @@
         </div>
     </div>
 </div>
-</div>
+
 
 <script>
     $('.slider-for').slick({
