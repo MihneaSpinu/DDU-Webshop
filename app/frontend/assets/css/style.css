@@ -3,6 +3,10 @@ body {
     background-color: rgb(43, 42, 51);
 }
 
+img {
+    mix-blend-mode: multiply;
+}
+
 .header {
     margin-bottom: 0;
     border-radius: 0;
@@ -32,6 +36,10 @@ footer {
 }
 
 .card {
-    border-radius: 0;
+    border-radius: 10px;
     box-shadow: 3px 3px 10px black;
+}
+
+.card-shadow {
+    box-shadow: 3px 30px 10px black;
 }
