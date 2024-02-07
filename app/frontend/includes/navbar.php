@@ -1,31 +1,31 @@
-<nav class="navbar d-none d-sm-block navbar-expand-lg bg-dark navbar-dark sticky-top">
+<nav class="navbar d-none d-sm-block navbar-expand-lg sticky-top">
   <div class="container">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="collapsibleNavbar">
-      <ul class="navbar-nav">
+      <ul class="navbar-nav yellow-color">
         <li class="nav-item">
           <a class="nav-link" href="/">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/">Designs</a>
+          <a class="nav-link" href="/categories">Designs</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/">Clothing</a>
+          <a class="nav-link" href="/categories/clothing">Clothing</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/">Accessories</a>
+          <a class="nav-link" href="/categories/accessories">Accessories</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/">Homewares</a>
+          <a class="nav-link" href="/categories/homewares">Homewares</a>
         </li>
       </ul>
     </div>
 
     <!-- Add the search and cart buttons here -->
-    <div class="nav-icons d-none">
+    <div class="nav-icons d-none yellow-color">
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" href="/search">
@@ -40,7 +40,7 @@
       </ul>
     </div>
     
-    <div class="profile">
+    <div class="profile yellow-color">
       <?php if ($user->isLoggedIn()) : ?>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">

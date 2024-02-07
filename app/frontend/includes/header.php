@@ -21,17 +21,17 @@
     <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.3.11/slick.min.js"></script>
 
     <header class="header">
-        <div class="d-sm-block d-none border-bottom pb-3">
+        <div class="d-sm-block d-none pb-3">
             <div class="container">
                 <div class="row">
                     <!-- Logo, adjust with size -->
                     <div class="col-sm-8">
                         <a class="navbar-brand" href="/">
-                            <img src="<?php echo FRONTEND_ASSET . 'logo.png'; ?>" alt="logo" style="width:40%;">
+                            <img src="<?php echo FRONTEND_ASSET . 'logo.png'; ?>" alt="logo" style="width:50%;">
                         </a>
                     </div>
-                    <div class="col-sm-4 text-right">
-                        <!-- Search and cart -->
+                    <!-- Create box for search and cart buttons, aligned vertically exactly center of the col div -->
+                    <div class="col-sm-4 d-flex align-items-center justify-content-end">
                         <a class="nav-link" href="/search">
                             <i class="fa fa-search"></i>
                         </a>
@@ -44,8 +44,8 @@
         </div>
         <div class="d-sm-none d-block">
             <!-- collapsed navbar to the left, h1 text center, search and cart icon right -->
-            <nav class="navbar sticky-top navbar-expand-sm bg-dark navbar-dark">
-                <div class="container">
+            <nav class="navbar sticky-top navbar-expand-sm">
+                <div class="container yellow-color">
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleHeader">
                         <span class="navbar-toggler-icon"></span>
                     </button>
@@ -55,16 +55,16 @@
                                 <a class="nav-link" href="/">Home</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/">Designs</a>
+                                <a class="nav-link" href="/categories">Designs</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/">Clothing</a>
+                                <a class="nav-link" href="/categories/clothing">Clothing</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/">Accessories</a>
+                                <a class="nav-link" href="/categories/accessories">Accessories</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/">Homewares</a>
+                                <a class="nav-link" href="/categories/homewares">Homewares</a>
                             </li>
                             <li class="nav-item">
                                 <?php if ($user->isLoggedIn()) : ?>

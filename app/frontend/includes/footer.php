@@ -10,7 +10,6 @@
     <footer p class="text-center text-body-secondary">© 2024 Hansenberg Tekniske Gymnasium</p>
     <footer p class="text-center text-body-secondary">Gunnar | Mihnea | Jeppe | Casper</p>
   </footer>
-  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>  
 </div>
 </body>
 </html>

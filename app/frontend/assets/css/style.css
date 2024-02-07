@@ -1,10 +1,19 @@
-
 body {
-    background-color: rgb(43, 42, 51);
+    background-color: rgb(34, 63, 73);
 }
 
 img {
-    mix-blend-mode: multiply;
+    border-radius: 5px;
+}
+
+nav {
+    background-color: rgb(34, 55, 62);
+    box-shadow: 3px 0px 10px black;
+}
+
+/* Yellow color hover yellow */
+.yellow-color a:hover {
+    color: rgb(248, 158, 26);
 }
 
 .header {
@@ -12,34 +21,67 @@ img {
     border-radius: 0;
     background-size: cover;
 }
+
 .header .nav-link {
     color: white;
     font-weight: bold;
 }
+
 .header .nav-link:hover {
     color: grey;
 }
-.navbar, .sidebar {
+
+.navbar,
+.sidebar {
     box-shadow: 3px 0px 10px black;
 }
 
-h1, p, ol {
-    color: white;
-    width: fit-content;
-}
 
 footer {
     color: white;
 }
-.bg-dark a, a, h1, h2, h3, label {
-    color: rgba(255,255,255,.7);
+
+a,
+h1,
+h2,
+h3,
+label,
+footer,
+p,
+ol,
+h5 {
+    color: white;
+    /* Remove underline */
+    text-decoration: none;
 }
 
 .card {
-    border-radius: 10px;
+    border-radius: 15px;
     box-shadow: 3px 3px 10px black;
+    background-color: rgb(34, 55, 62);
 }
 
 .card-shadow {
-    box-shadow: 3px 30px 10px black;
+    box-shadow: 3px 5px 10px black;
+}
+
+/* Hover on card-product. lower transparenty */
+.card-product:hover {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0);
+    transition: 0.5s;
+    /* Raise y level slightly */
+    transform: scale(1.05);
+}
+
+.btn {
+    background-color: rgb(248, 158, 26);
+    border: none;
+    color: white;
+}
+
+.btn:hover {
+    /* Darken */
+    background-color: rgb(181, 111, 6);
+    color: white;
 }

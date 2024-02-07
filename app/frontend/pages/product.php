@@ -4,11 +4,11 @@
             <div class="card slider slider-for">
                 <?php echo $imagesHTML; ?>
             </div>
-            <div class="card slider slider-nav">
+            <div class="card slider slider-nav mb-3 mx-4">
                 <?php echo $imagesHTML; ?>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 card">
             <h1 class="product-name">
                 <?php echo $product->product_name; ?>
             </h1>
@@ -21,31 +21,31 @@
                         <span class='text-danger'>
                             <del><?php echo $product->product_org_price; ?> dkk </del>
                         </span><br>
-                        <h3><?php echo $product->product_price; ?> dkk </h3>
+                    <h3><?php echo $product->product_price; ?> dkk </h3>
                     </p>
                 <?php else : ?>
                     <?php echo $product->product_price; ?> dkk <br>
                 <?php endif; ?>
             </div>
             <div class="border-top border-bottom my-2">
-                <form class="card my-2 py-2" action="" method="post">
+                <form class="my-2 py-2" action="" method="post">
                     <div class="row">
                         <!-- Only show if product has colors -->
                         <div class="col d-<?php echo $colorSelect ?>">
-                            <label class="text-dark">Color</label><br>
+                            <label class="">Color</label><br>
                             <select class="w-100" name="colorSelect" id="colorSelect">
                                 <?php echo $colorsHTML; ?>
                             </select>
                         </div>
                         <!-- Only show if product has sizes -->
                         <div class="col d-<?php echo $sizeSelect ?>">
-                            <label class="text-dark">Size</label><br>
+                            <label class="">Size</label><br>
                             <select class="w-100" name="sizeSelect" id="sizeSelect">
                                 <?php echo $sizesHTML; ?>
                             </select>
                         </div>
                         <div class="col-3">
-                            <label class="text-dark">Quantity</label><br>
+                            <label class="">Quantity</label><br>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <input class='btn btn-outline-secondary' type='button' value='-' onclick='decrementQuantity()'>
@@ -87,7 +87,7 @@
         slidesToShow: 3,
         slidesToScroll: 1,
         asNavFor: '.slider-for',
-        centerMode: true,
+        centerMode: false,
         focusOnSelect: true
     });
 
