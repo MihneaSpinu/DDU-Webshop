@@ -2,7 +2,7 @@
 <div class="container card mt-5">
     <div class="row">
         <div class="col-md-12">
-            <h1 class="mt-5 text-dark">Cart</h1>
+            <h1 class="mt-5">Cart</h1>
             <table class="table table-hover">
                 <thead>
                     <tr>

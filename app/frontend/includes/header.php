@@ -21,11 +21,11 @@
     <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.3.11/slick.min.js"></script>
 
     <header class="header">
-        <div class="d-sm-block d-none pb-3">
+        <div class="d-sm-block d-none py-3">
             <div class="container">
                 <div class="row">
-                    <!-- Logo, adjust with size -->
-                    <div class="col-sm-8">
+                    <!-- Logo, adjust with screen size  -->
+                    <div class="col-sm-8 my-2">
                         <a class="navbar-brand" href="/">
                             <img src="<?php echo FRONTEND_ASSET . 'logo.png'; ?>" alt="logo" style="width:50%;">
                         </a>

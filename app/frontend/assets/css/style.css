@@ -28,14 +28,12 @@ nav {
 }
 
 .header .nav-link:hover {
-    color: grey;
+    color: rgb(248, 158, 26);
 }
 
-.navbar,
-.sidebar {
+.navbar, .sidebar {
     box-shadow: 3px 0px 10px black;
 }
-
 
 footer {
     color: white;
@@ -49,6 +47,8 @@ label,
 footer,
 p,
 ol,
+td,
+th,
 h5 {
     color: white;
     /* Remove underline */
