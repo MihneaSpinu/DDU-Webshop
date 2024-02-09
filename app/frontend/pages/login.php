@@ -1,4 +1,4 @@
-<div class="container" style="padding-top: 1%; padding-bottom: 5%;">
+<div class="container">
   <h2>Login Form</h2>
   <form action="" method="post">
     <div class="form-group">
@@ -17,4 +17,7 @@
     <input type="hidden" name="csrf_token" value="<?php echo Token::generate(); ?>">
     <input type="submit" value="Log In">
   </form>
+  <div class="mt-3">
+    <a href="/register">Create account</a>
+  </div>
 </div>

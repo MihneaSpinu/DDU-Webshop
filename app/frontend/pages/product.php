@@ -1,12 +1,14 @@
-<div class="container mt-5">
+<div class="container">
     <div class="row">
         <div class="col-md-6">
             <div class="card slider slider-for">
                 <?php echo $imagesHTML; ?>
             </div>
-            <div class="card slider slider-nav mb-3 mx-4">
-                <?php echo $imagesHTML; ?>
-            </div>
+            <?php if (count($imagePaths) > 1) : ?>
+                <div class="card slider slider-nav mb-3 mx-4">
+                    <?php echo $imagesHTML; ?>
+                </div>
+            <?php endif; ?>
         </div>
         <div class="col-md-6 card">
             <h1 class="product-name">
@@ -32,39 +34,38 @@
                     <div class="row">
                         <!-- Only show if product has colors -->
                         <div class="col d-<?php echo $colorSelect ?>">
-                            <label class="">Color</label><br>
+                            <label>Color</label><br>
                             <select class="w-100" name="colorSelect" id="colorSelect">
                                 <?php echo $colorsHTML; ?>
                             </select>
                         </div>
                         <!-- Only show if product has sizes -->
                         <div class="col d-<?php echo $sizeSelect ?>">
-                            <label class="">Size</label><br>
+                            <label>Size</label><br>
                             <select class="w-100" name="sizeSelect" id="sizeSelect">
                                 <?php echo $sizesHTML; ?>
                             </select>
                         </div>
-                        <div class="col-3">
-                            <label class="">Quantity</label><br>
+                        <div class="col-auto" name="quantity">
+                            <label>Quantity</label><br>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <input class='btn btn-outline-secondary' type='button' value='-' onclick='decrementQuantity()'>
                                 </div>
-                                <input type="text" class="form-control text-center" name="quantitySelect" id="quantity" value="1" min="1" max="99">
+                                <input type="text" class="form-control text-center" name="quantitySelect" id="quantitySelect" value="1" min="1" max="99">
                                 <div class="input-group-append">
                                     <input class='btn btn-outline-secondary' type='button' value='+' onclick='incrementQuantity()'>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="cart">
-                        <?php if ($loggedIn) : ?>
-                            <input type="hidden" name="csrf_token" value="<?php echo Token::generate(); ?>">
-                            <input type="submit" name="addToCart" value="Add to cart" class="btn btn-primary mt-2">
-                        <?php else : ?>
-                            <a href="/login" class="btn btn-primary mt-2">Login to add to cart</a>
-                        <?php endif; ?>
-                    </div>
+                    <?php if ($loggedIn) : ?>
+                        <input type="submit" id="addToCart" value="Add to cart" class="btn btn-primary mt-2">
+                        <input type="hidden" name="addToCart" value="true">
+                        <input type="hidden" name="csrf_token" value="<?php echo Token::generate(); ?>">
+                    <?php else : ?>
+                        <a href="/login" class="btn btn-primary mt-2">Login to add to cart</a>
+                    <?php endif; ?>
                 </form>
             </div>
             <div class="product-description text-white">
@@ -76,6 +77,11 @@
 
 
 <script>
+    $("form").submit(function() {
+        $.post($(this).attr("action"), $(this).serialize());
+        return false;
+    });
+
     $('.slider-for').slick({
         slidesToShow: 1,
         slidesToScroll: 1,
@@ -92,52 +98,42 @@
     });
 
     function incrementQuantity() {
-        var quantityField = $("#quantity");
+        var quantityField = $("#quantitySelect");
         var currentQuantity = parseInt(quantityField.val());
-        if (currentQuantity <= 99) {
+        if (currentQuantity < 99) {
             quantityField.val(currentQuantity + 1);
+            handleProductQuantity();
         }
     }
 
     function decrementQuantity() {
-        var quantityField = $("#quantity");
+        var quantityField = $("#quantitySelect");
         var currentQuantity = parseInt(quantityField.val());
         if (currentQuantity > 1) {
             quantityField.val(currentQuantity - 1);
+            handleProductQuantity();
         }
     }
 
-    //event listener for colorSelect and sizeSelect
     $(document).on('change', '#colorSelect, #sizeSelect', function() {
         handleProductQuantity();
     });
 
-    // Event listener for page load or refresh
     $(document).ready(handleProductQuantity);
 
     function handleProductQuantity() {
         var color = $('#colorSelect').val();
         var size = $('#sizeSelect').val();
+        var quantity = $('#quantitySelect').val();
 
-        $.ajax({
-            url: "product.php",
-            type: "POST",
-            data: {
-                selectedColor: color,
-                selectedSize: size,
-                name: "<?php echo $product->product_name; ?>"
-            },
-            success: function(response) {
-                response = response.substring(response.indexOf("{"), response.indexOf("}") + 1);
-                var product = JSON.parse(response);
-                if (product.quantity < 1) {
-                    $('input[name="addToCart"]').prop('disabled', true);
-                    $('input[name="addToCart"]').val('Sold out');
-                } else {
-                    $('input[name="addToCart"]').prop('disabled', false);
-                    $('input[name="addToCart"]').val('Add to cart');
-                }
-            }
-        });
+        var products = <?php echo json_encode($products); ?>;
+        var product = products.find(p => p.color_ID == color && p.size_ID == size);
+        if (product.quantity < 1 || product.quantity < quantity) {
+            $('#addToCart').prop('disabled', true);
+            $('#addToCart').val('Sold Out');
+        } else {
+            $('#addToCart').prop('disabled', false);
+            $('#addToCart').val('Add to cart');
+        }
     }
 </script>

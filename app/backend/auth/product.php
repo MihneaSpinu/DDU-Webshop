@@ -22,8 +22,7 @@ $db = Database::getInstance();
 $name = Input::get('name');
 $discount = $db::getInstance()->get('discounts', array('discount_ID', '=', $product->discount_ID))->first();
 $product->product_org_price = $product->product_price / (1 - ($discount->discount_percentage / 100));
-if ($loggedIn)
-{
+if ($loggedIn) {
     $cart = $db::getInstance()->get('carts', array('uid', '=', $user->data()->uid))->first();
 }
 
@@ -40,7 +39,6 @@ foreach (Product::defineSizes($name, $product->color_ID) as $size) {
     $sizes[] = $size;
     $sizesHTML .= "<option value='" . $size->size_ID . "'>" . $size->size_name . "</option>";
 }
-
 
 $imagePaths = Product::defineImagePaths($name);
 $imagesHTML = "";
@@ -61,7 +59,8 @@ if (count($sizes) > 1) {
     $sizeSelect = "none";
 }
 
-if (Input::exists() && Input::get('addToCart')) {
+
+if (Input::exists() && Input::get('addToCart') && $loggedIn) {
     if (Token::check(Input::get('csrf_token'))) {
         $validate = new Validation();
         $validation = $validate->check($_POST, array(
@@ -81,8 +80,9 @@ if (Input::exists() && Input::get('addToCart')) {
         ));
 
         if ($validation->passed()) {
-            $cartProduct = $db->query("SELECT * FROM products WHERE product_name = ? AND color_ID = ? AND size_ID = ?", $name, Input::get('colorSelect'), Input::get('sizeSelect'))->first();
+            $cartProduct = $db->query("SELECT * FROM products WHERE product_name = ? AND color_ID = ? AND size_ID = ?", array($name, Input::get('colorSelect'), Input::get('sizeSelect')))->first();
             try {
+                error_log("Adding to cart: " . $cart->cart_ID . " " . $cartProduct->product_ID . " " . Input::get('quantitySelect') . " " . Token::check(Input::get('csrf_token')));
                 Product::addToCart(array(
                     'cart_ID' => $cart->cart_ID,
                     'product_ID' => $cartProduct->product_ID,
@@ -95,14 +95,4 @@ if (Input::exists() && Input::get('addToCart')) {
             $errors = $validation->errors();
         }
     }
-}
-
-$color = isset($_POST['selectedColor']) ? $_POST['selectedColor'] : null;
-$size = isset($_POST['selectedSize']) ? $_POST['selectedSize'] : null;
-$name = isset($_POST['name']) ? $_POST['name'] : null;
-
-if (Input::exists() && $color && $size && $name) {
-    $quantity = $db->query("SELECT quantity FROM products WHERE product_name = ? AND color_ID = ? AND size_ID = ?", array($name, $color, $size))->first()->quantity;
-
-    echo json_encode(array('quantity' => $quantity));
 }

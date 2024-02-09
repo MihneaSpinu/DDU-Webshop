@@ -38,7 +38,7 @@ if (Input::exists()) {
                     'name'      => Input::get('name')
                 ));
                 Session::flash('register-success', 'Thanks for registering! You can login now.');
-                Redirect::to('index.php');
+                Redirect::to('/login');
             } catch (Exception $e) {
                 die($e->getMessage());
             }

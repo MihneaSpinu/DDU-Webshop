@@ -1,5 +1,4 @@
-<!-- Show cart with total price -->
-<div class="container card mt-5">
+<div class="container card">
     <div class="row">
         <div class="col-md-12">
             <h1 class="mt-5">Cart</h1>

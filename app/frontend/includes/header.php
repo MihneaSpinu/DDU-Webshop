@@ -27,7 +27,7 @@
                     <!-- Logo, adjust with screen size  -->
                     <div class="col-sm-8 my-2">
                         <a class="navbar-brand" href="/">
-                            <img src="<?php echo FRONTEND_ASSET . 'logo.png'; ?>" alt="logo" style="width:50%;">
+                            <img class="w-75 h-auto" src="<?php echo FRONTEND_ASSET . 'logo.png'; ?>" alt="logo">
                         </a>
                     </div>
                     <!-- Create box for search and cart buttons, aligned vertically exactly center of the col div -->
@@ -46,54 +46,58 @@
             <!-- collapsed navbar to the left, h1 text center, search and cart icon right -->
             <nav class="navbar sticky-top navbar-expand-sm">
                 <div class="container yellow-color">
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleHeader">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="collapsibleHeader">
-                        <ul class="navbar-nav ml-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" href="/">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/categories">Designs</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/categories/clothing">Clothing</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/categories/accessories">Accessories</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/categories/homewares">Homewares</a>
-                            </li>
-                            <li class="nav-item">
-                                <?php if ($user->isLoggedIn()) : ?>
-                                    <ul class="navbar-nav ml-auto">
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="/profile">Profile</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="/logout">Logout</a>
-                                        </li>
-                                    </ul>
-                                <?php else : ?>
-                                    <a class="nav-link" href="/login">Profile</a>
-                                <?php endif; ?>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/search">
-                                    <i class="fa fa-search"></i> Search
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <a class="navbar-brand" href="/">
-                        <img src="<?php echo FRONTEND_ASSET . 'logo.png'; ?>" alt="logo" style="width:40px;">
-                    </a>
-                    <div class="text-right">
-                        <a class="nav-link" href="/cart">
-                            <i class="fa fa-shopping-cart"></i>
+                    <div class="row mx-auto">
+                        <div class="col-2 d-flex align-items">
+                            <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#collapsibleHeader">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+                        </div>
+                        <a class="col mx-auto navbar-brand justify-content-center d-flex" href="/">
+                            <img class="w-100" src="<?php echo FRONTEND_ASSET . 'logo.png'; ?>" alt="logo">
                         </a>
+                        <div class="col-2 d-flex align-items-center">
+                            <a class="nav-link" href="/cart">
+                                <i class="fa fa-shopping-cart"></i>
+                            </a>
+                        </div>
+                        <div class="collapse navbar-collapse" id="collapsibleHeader">
+                            <ul class="navbar-nav ml-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/designs">Designs</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/clothing">Clothing</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/accessories">Accessories</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/homewares">Homewares</a>
+                                </li>
+                                <li class="nav-item">
+                                    <?php if ($user->isLoggedIn()) : ?>
+                                        <ul class="navbar-nav ml-auto">
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="/profile">Profile</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="/logout">Logout</a>
+                                            </li>
+                                        </ul>
+                                    <?php else : ?>
+                                        <a class="nav-link" href="/login">Profile</a>
+                                    <?php endif; ?>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/search">
+                                        <i class="fa fa-search"></i> Search
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </nav>

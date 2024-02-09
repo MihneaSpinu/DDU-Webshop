@@ -1,5 +1,6 @@
-body {
+body, html {
     background-color: rgb(34, 63, 73);
+    height: 100%;
 }
 
 img {
@@ -9,6 +10,11 @@ img {
 nav {
     background-color: rgb(34, 55, 62);
     box-shadow: 3px 0px 10px black;
+}
+
+footer {
+    background-color: rgb(34, 55, 62);
+    box-shadow: 5px 50vh 10px 50vh rgb(34, 55, 62);
 }
 
 /* Yellow color hover yellow */
@@ -31,8 +37,13 @@ nav {
     color: rgb(248, 158, 26);
 }
 
-.navbar, .sidebar {
+.navbar,
+.sidebar {
     box-shadow: 3px 0px 10px black;
+}
+
+.navbar-toggler {
+    border-color: rgb(34, 63, 73);
 }
 
 footer {
@@ -51,7 +62,6 @@ td,
 th,
 h5 {
     color: white;
-    /* Remove underline */
     text-decoration: none;
 }
 
@@ -65,12 +75,13 @@ h5 {
     box-shadow: 3px 5px 10px black;
 }
 
-/* Hover on card-product. lower transparenty */
+.card-product {
+    transition: 0.3s;
+}
+
 .card-product:hover {
     cursor: pointer;
     background-color: rgba(255, 255, 255, 0);
-    transition: 0.5s;
-    /* Raise y level slightly */
     transform: scale(1.05);
 }
 
@@ -83,5 +94,22 @@ h5 {
 .btn:hover {
     /* Darken */
     background-color: rgb(181, 111, 6);
+    color: white;
+}
+
+/* Button push down */
+.btn:active {
+    transform: translateY(2px);
+    background-color: rgb(181, 111, 6);
+}
+
+.btn:disabled {
+    background-color: rgb(34, 63, 73);
+    color: white;
+}
+
+.btn-danger {
+    background-color: rgb(255, 0, 0);
+    border: none;
     color: white;
 }

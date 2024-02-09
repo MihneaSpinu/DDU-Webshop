@@ -79,6 +79,13 @@ class Product
                 }
             }
 
+            //Check every color for images, if there are none, add a placeholder
+            foreach ($colors as $color) {
+                if (!array_key_exists($color->color_name, $imagePaths)) {
+                    $imagePaths[$color->color_name][] = FRONTEND_ASSET . 'productImages/placeholder.png';
+                }
+            }
+
             return $imagePaths;
         } catch (Exception $e) {
             // Handle the exception (e.g., log it or display an error message)
