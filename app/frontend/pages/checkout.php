@@ -33,8 +33,8 @@
         <input type="text" class="form-control" id="city" name="city" required>
     </div>
     <div class="form-group">
-        <label for="phone">Phone (Optional)</label>
-        <input type="text" class="form-control" id="phone" name="phone">
+        <label for="phone">Phone</label>
+        <input type="text" class="form-control" id="phone" name="phone" required>
     </div>
 
     <h2>Payment</h2>

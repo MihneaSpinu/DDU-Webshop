@@ -68,6 +68,9 @@ class Product
                     $imageCount++;
                     $imagePaths['No Color'][] = FRONTEND_ASSET . 'productImages/' . $productName . ' (' . $imageCount . ')' . '.png';
                 }
+                if ($imageCount == 1) {
+                    $imagePaths['No Color'][] = FRONTEND_ASSET . 'productImages/' . $productName . '.png';
+                }
             } else {
                 foreach ($colors as $color) {
                     //All images are named like this: productname-colorname (number).png

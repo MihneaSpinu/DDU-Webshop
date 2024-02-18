@@ -11,7 +11,6 @@
       <p class="text-center text-body-secondary">Gunnar | Mihnea | Jeppe | Casper</p>
     </div>
   </footer>
-  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
   </body>
 
   </html>
