@@ -68,6 +68,9 @@ class Product
                     $imageCount++;
                     $imagePaths[$colors[0]->color_name][] = FRONTEND_ASSET . 'productImages/' . $productName . ' (' . $imageCount . ')' . '.png';
                 }
+                if ($imageCount == 1) {
+                    $imagePaths[$colors[0]->color_name][0] = FRONTEND_ASSET . 'productImages/' . $productName . '.png';
+                }
             } else {
                 foreach ($colors as $color) {
                     //All images are named like this: productname-colorname (number).png
@@ -75,6 +78,9 @@ class Product
                     foreach (glob(FRONTEND_ASSET . 'productImages/' . $productName . '-' . $color->color_name . '*') as $filename) {
                         $imageCount++;
                         $imagePaths[$color->color_name][] = FRONTEND_ASSET . 'productImages/' . $productName . '-' . $color->color_name . ' (' . $imageCount . ')' . '.png';
+                    }
+                    if ($imageCount == 1) {
+                        $imagePaths[$color->color_name][0] = FRONTEND_ASSET . 'productImages/' . $productName . '-' . $color->color_name . '.png';
                     }
                 }
             }
