@@ -23,14 +23,14 @@ CREATE TABLE `users_sessions` (
     PRIMARY KEY (`users_session_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `groups` (
+CREATE TABLE `pemissionGroups` (
     `group_ID` int(11) NOT NULL AUTO_INCREMENT,
     `permissions` json NOT NULL,
 
     PRIMARY KEY (`group_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `groups` (`group_ID`, `permissions`) VALUES
+INSERT INTO `permissionGroups` (`group_ID`, `permissions`) VALUES
 (1, '{"admin":1,"moderator":1,"user":1,"guest":1}'),
 (2, '{"admin":0,"moderator":0,"user":1,"guest":1}'),
 (3, '{"admin":0,"moderator":0,"user":0,"guest":1}');
@@ -157,7 +157,7 @@ CREATE TABLE `orders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `users`
-    ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`group_ID`) REFERENCES `groups` (`group_ID`);
+    ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`group_ID`) REFERENCES `permissionGroups` (`group_ID`);
 
 ALTER TABLE `users_sessions`
     ADD CONSTRAINT `users_sessions_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`);    

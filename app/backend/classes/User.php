@@ -131,7 +131,7 @@ class User
 
     public function hasPermission($key)
     {
-        $group = $this->_db->get('groups', array('group_ID', '=', $this->data()->group_ID));
+        $group = $this->_db->get('permissionGroups', array('group_ID', '=', $this->data()->group_ID));
 
         if  ($group->count())
         {
