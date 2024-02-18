@@ -149,6 +149,10 @@ class Database
     {
         return $this->results()[0];
     }
+    public function last()
+    {
+        return $this->results()[$this->_count - 1];
+    }
 
     public function error()
     {

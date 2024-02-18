@@ -1,5 +1,4 @@
 <?php
-require_once 'app/backend/core/Init.php';
 
 if (Input::exists()) {
     if (Token::check(Input::get('csrf_token'))) {
