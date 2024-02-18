@@ -4,12 +4,12 @@ require_once 'app/backend/core/Init.php';
 if (Input::get('name')) {
     $products = Database::getInstance()->query("SELECT * FROM products WHERE product_name = ?", array(Input::get('name')))->results();
     if (count($products) <= 0) {
-        Session::flash('danger', 'Product not found.');
+        Session::flash('register-error', 'Product not found.');
         Redirect::to('/');
     }
     $product = $products[0];
 } else {
-    Session::flash('danger', 'Product not found.');
+    Session::flash('register-error', 'Product not found.');
     Redirect::to('/');
 }
 
@@ -82,12 +82,21 @@ if (Input::exists() && Input::get('addToCart') && $loggedIn) {
         if ($validation->passed()) {
             $cartProduct = $db->query("SELECT * FROM products WHERE product_name = ? AND color_ID = ? AND size_ID = ?", array($name, Input::get('colorSelect'), Input::get('sizeSelect')))->first();
             try {
-                error_log("Adding to cart: " . $cart->cart_ID . " " . $cartProduct->product_ID . " " . Input::get('quantitySelect') . " " . Token::check(Input::get('csrf_token')));
-                Product::addToCart(array(
-                    'cart_ID' => $cart->cart_ID,
-                    'product_ID' => $cartProduct->product_ID,
-                    'quantity' => Input::get('quantitySelect')
-                ));
+                //If cart product exists in cart, update quantity
+                if ($db->query("SELECT * FROM cart_items WHERE cart_ID = ? AND product_ID = ?", array($cart->cart_ID, $cartProduct->product_ID))->count() > 0) {
+                    $cartItem = $db->query("SELECT * FROM cart_items WHERE cart_ID = ? AND product_ID = ?", array($cart->cart_ID, $cartProduct->product_ID))->first();
+                    $newQuantity = $cartItem->quantity + Input::get('quantitySelect');
+                    $db->update('cart_items', 'cart_item_ID', $cartItem->cart_item_ID, array('quantity' => $newQuantity));
+                } else {
+                    Product::addToCart(array(
+                        'cart_ID' => $cart->cart_ID,
+                        'product_ID' => $cartProduct->product_ID,
+                        'quantity' => Input::get('quantitySelect')
+                    ));
+                }
+                // Session::flash('register-error', 'Product added to cart.');
+                Redirect::to('/');
+                
             } catch (Exception $e) {
                 die($e->getMessage());
             }

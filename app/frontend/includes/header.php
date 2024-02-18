@@ -20,12 +20,22 @@
     <script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.3.11/slick.min.js"></script>
 
+    <?php
+    $cartHTML = "";
+    if ($user->isLoggedIn()) {
+        $cart = Database::getInstance()->get('carts', array('uid', '=', $user->data()->uid))->first();
+        //Find all cart items for this cart
+        $cartItems = Database::getInstance()->get('cart_items', array('cart_ID', '=', $cart->cart_ID))->results();
+        $cartHTML = "<span class='badge badge-warning' id='lblCartCount'>" . count($cartItems) . "</span>";
+    }
+    ?>
+
     <header class="header">
-        <div class="d-sm-block d-none py-3">
+        <div class="d-sm-block d-none my-3">
             <div class="container">
                 <div class="row">
                     <!-- Logo, adjust with screen size  -->
-                    <div class="col-sm-8 my-2">
+                    <div class="col-sm-8">
                         <a class="navbar-brand" href="/">
                             <img class="w-75 h-auto" src="<?php echo FRONTEND_ASSET . 'logo.png'; ?>" alt="logo">
                         </a>
@@ -37,27 +47,29 @@
                         </a>
                         <a class="nav-link" href="/cart">
                             <i class="fa fa-shopping-cart"></i>
+                            <?php echo $cartHTML; ?>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="d-sm-none d-block">
+        <div class="d-sm-none d-block mb-5">
             <!-- collapsed navbar to the left, h1 text center, search and cart icon right -->
             <nav class="navbar sticky-top navbar-expand-sm">
                 <div class="container yellow-color">
                     <div class="row mx-auto">
-                        <div class="col-2 d-flex align-items">
+                        <div class="col-2 d-flex justify-content-center h-75 my-auto align-items-center pl-0">
                             <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#collapsibleHeader">
                                 <span class="navbar-toggler-icon"></span>
                             </button>
                         </div>
                         <a class="col mx-auto navbar-brand justify-content-center d-flex" href="/">
-                            <img class="w-100" src="<?php echo FRONTEND_ASSET . 'logo.png'; ?>" alt="logo">
+                            <img class="w-100 h-auto" src="<?php echo FRONTEND_ASSET . 'logo.png'; ?>" alt="logo">
                         </a>
-                        <div class="col-2 d-flex align-items-center">
-                            <a class="nav-link" href="/cart">
+                        <div class="col-2 d-flex align-items-center justify-content-center">
+                            <a class="nav-link px-0 ml-auto" href="/cart">
                                 <i class="fa fa-shopping-cart"></i>
+                                <?php echo $cartHTML; ?>
                             </a>
                         </div>
                         <div class="collapse navbar-collapse" id="collapsibleHeader">
@@ -66,16 +78,16 @@
                                     <a class="nav-link" href="/">Home</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/designs">Designs</a>
+                                    <a class="nav-link" href="/categories">Designs</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/clothing">Clothing</a>
+                                    <a class="nav-link" href="/categories?category=clothing">Clothing</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/accessories">Accessories</a>
+                                    <a class="nav-link" href="/categories?category=accessories">Accessories</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/homewares">Homewares</a>
+                                    <a class="nav-link" href="/categories?category=homewares">Homewares</a>
                                 </li>
                                 <li class="nav-item">
                                     <?php if ($user->isLoggedIn()) : ?>

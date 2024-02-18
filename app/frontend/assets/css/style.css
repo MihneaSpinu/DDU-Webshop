@@ -1,4 +1,5 @@
-body, html {
+body,
+html {
     background-color: rgb(34, 63, 73);
     height: 100%;
 }
@@ -14,7 +15,8 @@ nav {
 
 footer {
     background-color: rgb(34, 55, 62);
-    box-shadow: 5px 50vh 10px 50vh rgb(34, 55, 62);
+    box-shadow: 5px 50vh 10px 50vh rgb(34, 55, 62);    
+    color: white;
 }
 
 /* Yellow color hover yellow */
@@ -46,10 +48,6 @@ footer {
     border-color: rgb(34, 63, 73);
 }
 
-footer {
-    color: white;
-}
-
 a,
 h1,
 h2,
@@ -63,6 +61,10 @@ th,
 h5 {
     color: white;
     text-decoration: none;
+}
+
+.mt-n5 {
+    margin-top: -3rem !important;
 }
 
 .card {
@@ -92,7 +94,6 @@ h5 {
 }
 
 .btn:hover {
-    /* Darken */
     background-color: rgb(181, 111, 6);
     color: white;
 }
@@ -112,4 +113,18 @@ h5 {
     background-color: rgb(255, 0, 0);
     border: none;
     color: white;
+}
+
+.label-warning[href],
+.badge-warning[href] {
+    background-color: #c67605;
+}
+
+#lblCartCount {
+    font-size: 12px;
+    background: rgb(248, 158, 26);
+    color: #fff;
+    padding: 0 5px;
+    vertical-align: top;
+    margin-left: -10px;
 }

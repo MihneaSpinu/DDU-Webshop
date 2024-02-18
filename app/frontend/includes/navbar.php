@@ -10,16 +10,16 @@
           <a class="nav-link" href="/">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/designs">Designs</a>
+          <a class="nav-link" href="/categories">Designs</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/clothing">Clothing</a>
+          <a class="nav-link" href="/categories?category=clothing">Clothing</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/accessories">Accessories</a>
+          <a class="nav-link" href="/categories?category=accessories">Accessories</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/homewares">Homewares</a>
+          <a class="nav-link" href="/categories?category=homewares">Homewares</a>
         </li>
       </ul>
     </div>
@@ -31,6 +31,7 @@
         </a>
         <a class="nav-link" href="/cart">
           <i class="fa fa-shopping-cart"></i>
+          <?php echo $cartHTML; ?>
         </a>
       </div>
     </div>

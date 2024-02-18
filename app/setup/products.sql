@@ -28,7 +28,7 @@ VALUES
         1
     ),
     (
-        'Vilain Shirt',
+        'Villain Shirt',
         "This t-shirt is everything you've dreamed of and more. It feels soft and lightweight, with the right amount of stretch. It's comfortable and flattering for all.",
         150.00,
         140,
@@ -105,7 +105,7 @@ VALUES
         3
     ),
     (
-        'Vilain Hoodie',
+        'Villain Hoodie',
         "Who knew that the softest hoodie you'll ever own comes with such a cool design. You won't regret buying this classic streetwear piece of apparel with a convenient pouch pocket and warm hood for chilly evenings.",
         300.00,
         560,
@@ -196,7 +196,7 @@ VALUES
         6
     ),
     (
-        'Vilain iPhone Case',
+        'Villain iPhone Case',
         "Protect your phone with style using a durable, dual-layered case. The outer shell is made of impact-resistant polycarbonate, while the inner lining sports TPU lining for maximum impact absorption. Keep your phone fashionable and safe all year round!",
         180.00,
         120,

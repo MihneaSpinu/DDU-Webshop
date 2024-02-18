@@ -8,17 +8,17 @@
           <div class="card-body">
             <h5 class="card-title">Clothing</h5>
             <p class="card-text">Explore cool designs here</p>
-            <a href="/clothing" class="btn btn-primary">Shop Now</a>
+            <a href="/categories?category=clothing" class="btn btn-primary">Shop Now</a>
           </div>
         </div>
       </div>
       <div class="card card-shadow">
-        <img src="<?php echo FRONTEND_ASSET ?>productImages/Case (1).png" class="card-img-top">
+        <img src="<?php echo FRONTEND_ASSET ?>productImages/Finite Abys Banner iPhone Case (1).png" class="card-img-top">
         <div class="mt-auto">
           <div class="card-body">
             <h5 class="card-title">Accessories</h5>
             <p class="card-text">Find the latest accessories here.</p>
-            <a href="/accessories" class="btn btn-primary">Shop Now</a>
+            <a href="/categories?category=accessories" class="btn btn-primary">Shop Now</a>
           </div>
         </div>
       </div>
@@ -28,7 +28,7 @@
           <div class="card-body">
             <h5 class="card-title">Homewares</h5>
             <p class="card-text">Find great decorations for your home.</p>
-            <a href="/homewares" class="btn btn-primary">Shop Now</a>
+            <a href="/categories?category=homewares" class="btn btn-primary">Shop Now</a>
           </div>
         </div>
       </div>

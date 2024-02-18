@@ -1,8 +1,7 @@
 <?php
-require_once 'app/backend/core/Init.php';
-
 if (!$user->isLoggedIn()) {
-    Redirect::to('index.php');
+    Session::flash('register-error', 'You must be logged in to view your cart.');
+    Redirect::to('/');
 }
 
 $sessionUser = $user->data();
@@ -36,7 +35,7 @@ foreach ($cartItems as $cartItem) {
                             "<form action='' method='post'>
                             <input type='hidden' name='csrf_token' value='" . Token::generate() . "'>
                             <input type='hidden' name='cartItemID' value='" . $cartItem->cart_item_ID . "'>
-                            <input type='submit' name='removeFromCart' value='Remove' class='btn btn-danger btn-sm'>
+                            <input type='submit' name='removeFromCart' value='Remove' class='btn btn-danger btn-sm mt-3'>
                             </form>
                         </td>
                         <td>

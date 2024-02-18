@@ -23,11 +23,9 @@
             </table>
         </div>
     </div>
-    <div class="row">
+    <div class="row mt-2 mb-3">
         <div class="col-md-12">
-            <form action="checkout.php" method="post">
-                <input type="submit" value="Checkout" class="btn btn-primary">
-            </form>
+            <a href="/checkout" class="btn btn-primary">Checkout</a>
         </div>
     </div>
 </div>
