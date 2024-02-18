@@ -77,10 +77,6 @@
 
 
 <script>
-    $("form").submit(function() {
-        $.post($(this).attr("action"), $(this).serialize());
-        return false;
-    });
 
     $('.slider-for').slick({
         slidesToShow: 1,

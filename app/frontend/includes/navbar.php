@@ -41,7 +41,7 @@
         <?php if ($user->isLoggedIn()) : ?>
           <a class="nav-link" href="/profile">Profile</a>
           <a class="nav-link" href="/logout">Logout</a>
-          <?php if ($user->hasPermission('admin')) : ?>
+          <?php echo ($user->data()->group_ID); if ($user->hasPermission('admin')) : ?>
             <a class="nav-link" href="/warehouse">Admin</a>
           <?php endif; ?>
         <?php else : ?>

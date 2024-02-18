@@ -11,13 +11,15 @@
     </div>
     <div class="form-group form-check">
       <label for="remember">
-        <input type="checkbox" name="remember" id="remember">Remember Me
+        <input type="checkbox" name="remember" id="remember"> Remember Me
       </label>
     </div>
     <input type="hidden" name="csrf_token" value="<?php echo Token::generate(); ?>">
-    <input type="submit" value="Log In">
+    <input class="btn" type="submit" value="Log In">
   </form>
+  <br>
+  <a class="text-white"> or </a>
   <div class="mt-3">
-    <a href="/register">Create account</a>
+    <a class="btn" href="/register">Create account</a>
   </div>
 </div>

@@ -1,4 +1,4 @@
-<div class="container" style="padding-top: 5%; padding-bottom: 5%;">
+<div class="container">
   <h2>Register Form</h2>
   <form action="" method="post">
     <div class="form-group">

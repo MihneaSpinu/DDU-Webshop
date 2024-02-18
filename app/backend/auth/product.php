@@ -95,8 +95,8 @@ if (Input::exists() && Input::get('addToCart') && $loggedIn) {
                     ));
                 }
                 
-                Session::flash('register-error', 'Product added to cart.');
-                Redirect::to('/');
+                Session::flash('login-success', 'Product added to cart.');
+                Redirect::to('/product?name=' . $name);
                 
             } catch (Exception $e) {
                 die($e->getMessage());
