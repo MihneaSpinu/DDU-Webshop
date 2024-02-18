@@ -508,10 +508,6 @@ DELIMITER ;
 
 CALL updateDiscount('BroomSweep Logo Shirt', 'Black Friday');
 
---Update discount id of broomsweep logo shirt to 5
-UPDATE products SET discount_ID = 5 WHERE product_name = 'BroomSweep Logo Shirt';
-
---BroomSweep Logo Shirt, Hero shirt, Vilain shirt. All colors, all sizes
 CALL addColorsToProduct('BroomSweep Logo Shirt', 'White,Black,Red,Blue,Green,Yellow,Orange,Purple,Pink');
 CALL addColorsToProduct('Hero Shirt', 'White,Black,Red,Blue,Green,Yellow,Orange,Purple,Pink');
 CALL addColorsToProduct('Vilain Shirt', 'White,Black,Red,Blue,Green,Yellow,Orange,Purple,Pink');
