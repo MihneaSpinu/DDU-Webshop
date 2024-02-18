@@ -12,7 +12,7 @@
                             <div class="card-body">
                                 <h5 class="card-title mt-3"><?php echo $design['design_name']; ?></h5>
                                 <p class="card-text"><?php echo $design['design_description']; ?></p>
-                                <a href="/designs?design=<?php echo $design['design_name']; ?>" class="btn btn-primary">See all products</a>
+                                <a href="/" class="btn btn-primary">See all products</a>
                             </div>
                         </div>
                     </div>
