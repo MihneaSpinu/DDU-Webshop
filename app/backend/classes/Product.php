@@ -62,14 +62,11 @@ class Product
             $imagePaths = [];
             $colors = self::defineColors($productName);
 
-            if (in_array('No Color', $colors)) {
+            if ($colors[0]->color_name == 'No Color') {
                 $imageCount = 0;
-                foreach (glob(FRONTEND_ASSET . 'productImages/' . $productName) as $filename) {
+                foreach (glob(FRONTEND_ASSET . 'productImages/' . $productName . '*') as $filename) {
                     $imageCount++;
-                    $imagePaths['No Color'][] = FRONTEND_ASSET . 'productImages/' . $productName . ' (' . $imageCount . ')' . '.png';
-                }
-                if ($imageCount == 1) {
-                    $imagePaths['No Color'][] = FRONTEND_ASSET . 'productImages/' . $productName . '.png';
+                    $imagePaths[$colors[0]->color_name][] = FRONTEND_ASSET . 'productImages/' . $productName . ' (' . $imageCount . ')' . '.png';
                 }
             } else {
                 foreach ($colors as $color) {
