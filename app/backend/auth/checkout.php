@@ -31,10 +31,7 @@ if (Input::exists()) {
             'country' => array(
                 'required' => true
             ),
-            'firstName' => array(
-                'required' => true
-            ),
-            'lastName' => array(
+            'name' => array(
                 'required' => true
             ),
             'address' => array(
@@ -142,8 +139,4 @@ $images = array();
 foreach ($cartItems as $cartItem) {
     $product = Database::getInstance()->get('products', array('product_ID', '=', $cartItem->product_ID))->first();
     $images[] = Product::defineImagePaths($product->product_name);
-}
-
-foreach ($images as $image) {
-    $firstImage[] = array_values($image[array_rand($image)])[0];
 }

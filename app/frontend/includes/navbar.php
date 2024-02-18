@@ -44,6 +44,9 @@
         <?php else : ?>
           <a class="nav-link" href="/login">Profile</a>
         <?php endif; ?>
+        <?php if ($user->hasPermission('admin')) : ?>
+          <a class="nav-link" href="/warehouse">Admin</a>
+        <?php endif; ?>
       </div>
     </div>
   </div>

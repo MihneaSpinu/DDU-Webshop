@@ -94,9 +94,10 @@ if (Input::exists() && Input::get('addToCart') && $loggedIn) {
                         'quantity' => Input::get('quantitySelect')
                     ));
                 }
-                // Session::flash('register-error', 'Product added to cart.');
-                Redirect::to('/');
                 
+                //Redirect to cart
+                Redirect::to('/cart');
+
             } catch (Exception $e) {
                 die($e->getMessage());
             }
