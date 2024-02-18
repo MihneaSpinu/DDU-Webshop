@@ -26,7 +26,7 @@
 
     <div class="nav-icons d-none yellow-color order-lg-last">
       <div class="d-flex">
-        <a class="nav-link" href="/search">
+        <a class="nav-link" href="/">
           <i class="fa fa-search"></i>
         </a>
         <a class="nav-link" href="/cart">

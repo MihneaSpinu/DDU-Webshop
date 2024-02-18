@@ -12,7 +12,39 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php echo $productsHTML; ?>
+                    <?php foreach ($cartItems as $cartItem) :
+                        $product = Database::getInstance()->get('products', array('product_ID', '=', $cartItem->product_ID))->first();
+                        $color = Database::getInstance()->get('colors', array('color_ID', '=', $product->color_ID))->first();
+                        $size = Database::getInstance()->get('sizes', array('size_ID', '=', $product->size_ID))->first();
+                        $discount = Database::getInstance()->get('discounts', array('discount_ID', '=', $product->discount_ID))->first();
+                    ?>
+                        <tr>
+                            <td>
+                                <?php echo $product->product_name; ?><br>
+                                <?php echo (($color->color_ID !== 1 && $size->size_ID !== 1) ? $color->color_name . " / " . $size->size_name : ""); ?>
+                                <form action="" method="post">
+                                    <input type="hidden" name="cartItemID" value="<?php echo $cartItem->cart_item_ID; ?>">
+                                    <input type="submit" name="removeFromCart" value="Remove" class="btn btn-danger btn-sm">
+                                </form>
+                            </td>
+                            <td>
+                                <form action="" method="post">
+                                    <div class="input-group">
+                                        <input class="btn btn-outline-secondary" type="submit" value="-" name="decrement">
+                                        <input type="text" class="form-control text-center" name="quantity" value="<?php echo $cartItem->quantity; ?>" min="1" max="99">
+                                        <input class="btn btn-outline-secondary" type="submit" value="+" name="increment">
+                                        <input type="hidden" name="cartItemID" value="<?php echo $cartItem->cart_item_ID; ?>">
+                                    </div>
+                                </form>
+                            </td>
+                            <td>
+                                <?php echo (($discount->discount_ID !== 1 && $discount->active) ? "<span class='text-danger'><del>" . $product->product_org_price . " dkk </del></span><br>" . $product->product_price . " dkk <br>" . "<span class='text-success'>Discount: " . $discount->discount_percentage . "%</span>" : $product->product_price . " dkk <br"); ?>
+                            </td>
+                            <td id="subtotal_<?php echo $cartItem->cart_item_ID; ?>">
+                                <?php echo $cartItem->quantity * $product->product_price . " dkk"; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                     <tr>
@@ -25,57 +57,8 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <form action="checkout.php" method="post">
-                <input type="submit" value="Checkout" class="btn btn-primary">
-            </form>
+            <a href="/" class="btn btn-primary">Continue shopping</a>
+            <a href="/checkout" class="btn btn-success">Checkout</a>
         </div>
     </div>
 </div>
-
-<script>
-    function incrementQuantity(cartItemID) {
-        var quantityField = $("#quantity_" + cartItemID);
-        var currentQuantity = parseInt(quantityField.val());
-        if (currentQuantity <= 99) {
-            quantityField.val(currentQuantity + 1);
-            updateCartItemQuantity(cartItemID, currentQuantity + 1);
-        }
-    }
-
-    function decrementQuantity(cartItemID) {
-        var quantityField = $("#quantity_" + cartItemID);
-        var currentQuantity = parseInt(quantityField.val());
-        if (currentQuantity > 1) {
-            quantityField.val(currentQuantity - 1);
-            updateCartItemQuantity(cartItemID, currentQuantity - 1);
-        }
-    }
-
-    // Add event listener for input changes
-    $(document).on('input', 'input[id^="quantity_"]', function() {
-        //keeo input value between 1 and 99
-        if ($(this).val() < 1) {
-            $(this).val(1);
-        } else if ($(this).val() > 99) {
-            $(this).val(99);
-        }
-        var cartItemID = $(this).attr('id').replace('quantity_', '');
-        var newQuantity = $(this).val();
-        updateCartItemQuantity(cartItemID, newQuantity);
-    });
-
-    function updateCartItemQuantity(cartItemID, newQuantity) {
-        $.ajax({
-            url: "cart.php",
-            type: "POST",
-            data: {
-                cartItemID: cartItemID,
-                newQuantity: newQuantity
-            },
-
-            success: function(response) {
-                window.location.reload();
-            }
-        });
-    }
-</script>

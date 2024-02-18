@@ -32,7 +32,7 @@
                     </div>
                     <!-- Create box for search and cart buttons, aligned vertically exactly center of the col div -->
                     <div class="col-sm-4 d-flex align-items-center justify-content-end">
-                        <a class="nav-link" href="/search">
+                        <a class="nav-link" href="/">
                             <i class="fa fa-search"></i>
                         </a>
                         <a class="nav-link" href="/cart">
@@ -92,7 +92,7 @@
                                     <?php endif; ?>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/search">
+                                    <a class="nav-link" href="/">
                                         <i class="fa fa-search"></i> Search
                                     </a>
                                 </li>
